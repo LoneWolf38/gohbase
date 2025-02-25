@@ -9,10 +9,10 @@ package mock
 //    go install go.uber.org/mock/mockgen@v0.4.0
 // then run 'go generate' to auto-generate mock_client.
 
-//go:generate mockgen -destination=client.go -package=mock github.com/tsuna/gohbase Client
-//go:generate mockgen -destination=admin_client.go -package=mock github.com/tsuna/gohbase AdminClient
+//go:generate mockgen -destination=client.go -package=mock github.com/LoneWolf38/gohbase Client
+//go:generate mockgen -destination=admin_client.go -package=mock github.com/LoneWolf38/gohbase AdminClient
 //go:generate mockgen -destination=conn.go -package=mock net Conn
 //go:generate mockgen -destination=call.go -package=mock github.com/LoneWolf38/gohbase/hrpc Call
 //go:generate mockgen -destination=zk/client.go -package=mock github.com/LoneWolf38/gohbase/zk Client
 //go:generate mockgen -destination=region/client.go -package=mock github.com/LoneWolf38/gohbase/hrpc RegionClient
-//go:generate mockgen -destination=rpcclient.go -package=mock github.com/tsuna/gohbase RPCClient
+//go:generate mockgen -destination=rpcclient.go -package=mock github.com/LoneWolf38/gohbase RPCClient

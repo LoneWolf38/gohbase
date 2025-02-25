@@ -27,12 +27,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LoneWolf38/gohbase"
 	"github.com/LoneWolf38/gohbase/filter"
 	"github.com/LoneWolf38/gohbase/hrpc"
 	"github.com/LoneWolf38/gohbase/pb"
 	"github.com/LoneWolf38/gohbase/region"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsuna/gohbase"
 	"google.golang.org/protobuf/proto"
 )
 

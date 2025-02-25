@@ -8,12 +8,12 @@ package mock_test
 import (
 	"net"
 
+	"github.com/LoneWolf38/gohbase"
 	"github.com/LoneWolf38/gohbase/hrpc"
 	"github.com/LoneWolf38/gohbase/test/mock"
 	regionMock "github.com/LoneWolf38/gohbase/test/mock/region"
 	zkMock "github.com/LoneWolf38/gohbase/test/mock/zk"
 	"github.com/LoneWolf38/gohbase/zk"
-	"github.com/tsuna/gohbase"
 )
 
 var (
