@@ -15,11 +15,11 @@ import (
 	"sync"
 	"time"
 
-	"github.com/tsuna/gohbase/compression"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/region"
-	"github.com/tsuna/gohbase/zk"
+	"github.com/LoneWolf38/gohbase/compression"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/region"
+	"github.com/LoneWolf38/gohbase/zk"
 	"google.golang.org/protobuf/proto"
 	"modernc.org/b/v2"
 )
@@ -145,8 +145,8 @@ func newClient(zkquorum string, options ...Option) *client {
 	}
 	c.logger.Debug("Creating new client.", "Host", slog.StringValue(zkquorum))
 
-	//Have to create the zkClient after the Options have been set
-	//since the zkTimeout could be changed as an option
+	// Have to create the zkClient after the Options have been set
+	// since the zkTimeout could be changed as an option
 	c.zkClient = zk.NewClient(zkquorum, c.zkTimeout, c.zkDialer, c.logger)
 	c.regions = keyRegionCache{
 		logger:  c.logger,
@@ -162,7 +162,6 @@ func newClient(zkquorum string, options ...Option) *client {
 
 // DebugState information about the clients keyRegionCache, and clientRegionCache
 func DebugState(c Client) ([]byte, error) {
-
 	debugInfoJson, err := json.Marshal(c)
 	if err != nil {
 		if cclient, ok := c.(*client); ok {
@@ -175,7 +174,6 @@ func DebugState(c Client) ([]byte, error) {
 }
 
 func (c *client) MarshalJSON() ([]byte, error) {
-
 	var done string
 	if c.done != nil {
 		select {
@@ -291,7 +289,8 @@ func CompressionCodec(codec string) Option {
 // into the ZooKeeper client Connect() call, which allows for customizing
 // network connections.
 func ZooKeeperDialer(dialer func(
-	ctx context.Context, network, addr string) (net.Conn, error)) Option {
+	ctx context.Context, network, addr string) (net.Conn, error),
+) Option {
 	return func(c *client) {
 		c.zkDialer = dialer
 	}
@@ -300,7 +299,8 @@ func ZooKeeperDialer(dialer func(
 // RegionDialer will return an option that uses the specified Dialer for
 // connecting to region servers. This allows for connecting through proxies.
 func RegionDialer(dialer func(
-	ctx context.Context, network, addr string) (net.Conn, error)) Option {
+	ctx context.Context, network, addr string) (net.Conn, error),
+) Option {
 	return func(c *client) {
 		c.regionDialer = dialer
 	}
@@ -386,7 +386,8 @@ func (c *client) mutate(m *hrpc.Mutate) (*hrpc.Result, error) {
 }
 
 func (c *client) CheckAndPut(p *hrpc.Mutate, family string,
-	qualifier string, expectedValue []byte) (bool, error) {
+	qualifier string, expectedValue []byte,
+) (bool, error) {
 	cas, err := hrpc.NewCheckAndPut(p, family, qualifier, expectedValue)
 	if err != nil {
 		return false, err

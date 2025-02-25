@@ -15,10 +15,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/tsuna/gohbase/compression"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/region"
+	"github.com/LoneWolf38/gohbase/compression"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/region"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -28,26 +28,26 @@ type testClient struct {
 }
 
 var nsreRegion = &pb.Result{Cell: []*pb.Cell{
-	&pb.Cell{
+	{
 		Row:       []byte("nsre,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("regioninfo"),
 		Value: []byte("PBUF\b\xc4\xcd\xe9\x99\xe0)\x12\x0f\n\adefault\x12\x04nsre" +
 			"\x1a\x00\"\x00(\x000\x008\x00"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("nsre,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("seqnumDuringOpen"),
 		Value:     []byte("\x00\x00\x00\x00\x00\x00\x00\x02"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("nsre,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("server"),
 		Value:     []byte("regionserver:1"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("nsre,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("serverstartcode"),
@@ -86,55 +86,56 @@ func makeRegionResult(key []byte) *pb.ScanResponse {
 	regionInfoValue = append([]byte("PBUF"), regionInfoValue...)
 
 	return &pb.ScanResponse{Results: []*pb.Result{
-		&pb.Result{Cell: []*pb.Cell{
-			&pb.Cell{
+		{Cell: []*pb.Cell{
+			{
 				Row:       row,
 				Family:    []byte("info"),
 				Qualifier: []byte("regioninfo"),
 				Value:     regionInfoValue,
 			},
-			&pb.Cell{
+			{
 				Row:       row,
 				Family:    []byte("info"),
 				Qualifier: []byte("seqnumDuringOpen"),
 				Value:     []byte("\x00\x00\x00\x00\x00\x00\x00\x02"),
 			},
-			&pb.Cell{
+			{
 				Row:       row,
 				Family:    []byte("info"),
 				Qualifier: []byte("server"),
 				Value:     fqtable,
 			},
-			&pb.Cell{
+			{
 				Row:       row,
 				Family:    []byte("info"),
 				Qualifier: []byte("serverstartcode"),
 				Value:     []byte("\x00\x00\x01N\x02\x92R\xb1"),
 			},
-		}}}}
+		}},
+	}}
 }
 
 var metaRow = &pb.Result{Cell: []*pb.Cell{
-	&pb.Cell{
+	{
 		Row:       []byte("test,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("regioninfo"),
 		Value: []byte("PBUF\b\xc4\xcd\xe9\x99\xe0)\x12\x0f\n\adefault\x12\x04test" +
 			"\x1a\x00\"\x00(\x000\x008\x00"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("test,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("seqnumDuringOpen"),
 		Value:     []byte("\x00\x00\x00\x00\x00\x00\x00\x02"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("test,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("server"),
 		Value:     []byte("regionserver:2"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("test,,1434573235908.56f833d5569a27c7a43fbf547b4924a4."),
 		Family:    []byte("info"),
 		Qualifier: []byte("serverstartcode"),
@@ -143,26 +144,26 @@ var metaRow = &pb.Result{Cell: []*pb.Cell{
 }}
 
 var test1SplitA = &pb.Result{Cell: []*pb.Cell{
-	&pb.Cell{
+	{
 		Row:       []byte("test1,,1480547738107.825c5c7e480c76b73d6d2bad5d3f7bb8."),
 		Family:    []byte("info"),
 		Qualifier: []byte("regioninfo"),
 		Value: []byte("PBUF\b\xfbÖ\xbc\x8b+\x12\x10\n\adefault\x12\x05" +
 			"test1\x1a\x00\"\x03baz(\x000\x008\x00"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("test1,,1480547738107.825c5c7e480c76b73d6d2bad5d3f7bb8."),
 		Family:    []byte("info"),
 		Qualifier: []byte("seqnumDuringOpen"),
 		Value:     []byte("\x00\x00\x00\x00\x00\x00\x00\v"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("test1,,1480547738107.825c5c7e480c76b73d6d2bad5d3f7bb8."),
 		Family:    []byte("info"),
 		Qualifier: []byte("server"),
 		Value:     []byte("regionserver:1"),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("test1,,1480547738107.825c5c7e480c76b73d6d2bad5d3f7bb8."),
 		Family:    []byte("info"),
 		Qualifier: []byte("serverstartcode"),
@@ -170,8 +171,10 @@ var test1SplitA = &pb.Result{Cell: []*pb.Cell{
 	},
 }}
 
-var m sync.RWMutex
-var clients map[string]uint32
+var (
+	m       sync.RWMutex
+	clients map[string]uint32
+)
 
 func init() {
 	clients = make(map[string]uint32)
@@ -181,7 +184,8 @@ func newMockRegionClient(addr string, ctype region.ClientType, queueSize int,
 	flushInterval time.Duration, effectiveUser string,
 	readTimeout time.Duration, codec compression.Codec,
 	dialer func(ctx context.Context, network, addr string) (net.Conn, error),
-	log *slog.Logger) hrpc.RegionClient {
+	log *slog.Logger,
+) hrpc.RegionClient {
 	m.Lock()
 	clients[addr]++
 	m.Unlock()
@@ -243,13 +247,16 @@ func (c *testClient) QueueRPC(call hrpc.Call) {
 		call.ResultChan() <- hrpc.RPCResult{}
 	} else if bytes.HasPrefix(call.Key(), []byte("test,")) {
 		call.ResultChan() <- hrpc.RPCResult{Msg: &pb.ScanResponse{
-			Results: []*pb.Result{metaRow}}}
+			Results: []*pb.Result{metaRow},
+		}}
 	} else if bytes.HasPrefix(call.Key(), []byte("test1,,")) {
 		call.ResultChan() <- hrpc.RPCResult{Msg: &pb.ScanResponse{
-			Results: []*pb.Result{test1SplitA}}}
+			Results: []*pb.Result{test1SplitA},
+		}}
 	} else if bytes.HasPrefix(call.Key(), []byte("nsre,,")) {
 		call.ResultChan() <- hrpc.RPCResult{Msg: &pb.ScanResponse{
-			Results: []*pb.Result{nsreRegion}}}
+			Results: []*pb.Result{nsreRegion},
+		}}
 	} else if bytes.HasPrefix(call.Key(), []byte("tablenotfound,")) {
 		call.ResultChan() <- hrpc.RPCResult{Msg: &pb.ScanResponse{
 			Results:     []*pb.Result{},

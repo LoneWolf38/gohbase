@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"go.uber.org/mock/gomock"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/region"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/region"
 )
 
 func TestDebugStateSanity(t *testing.T) {
@@ -84,14 +84,12 @@ func TestDebugStateSanity(t *testing.T) {
 	client.clients.put("regionserver:1", region3, newClientFn)
 
 	jsonVal, err := DebugState(client)
-
 	if err != nil {
 		t.Fatalf("DebugInfo should not have an error: %v", err)
 	}
 
 	var jsonUnMarshal map[string]interface{}
 	err = json.Unmarshal(jsonVal, &jsonUnMarshal)
-
 	if err != nil {
 		t.Fatalf("Encoutered eror when Unmarshalling: %v", err)
 	}
@@ -112,5 +110,4 @@ func TestDebugStateSanity(t *testing.T) {
 	assert.Equal(t, len(clientRegionCache.(map[string]interface{})), 1) // only have one client
 
 	assert.Equal(t, true, json.Valid(jsonVal))
-
 }

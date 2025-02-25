@@ -16,9 +16,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/hrpc"
 	"github.com/tsuna/gohbase"
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/hrpc"
 )
 
 // Name of the meta region.
@@ -79,7 +79,7 @@ func TestCreatePresplitTable(t *testing.T) {
 
 	ac := gohbase.NewAdminClient(*host)
 	splitkeys := [][]byte{
-		[]byte{3},
+		{3},
 		[]byte("foo"),
 		[]byte("wow"),
 	}

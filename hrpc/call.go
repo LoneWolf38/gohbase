@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"unsafe"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 

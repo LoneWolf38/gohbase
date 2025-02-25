@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	hrpc "github.com/tsuna/gohbase/hrpc"
+	hrpc "github.com/LoneWolf38/gohbase/hrpc"
 	gomock "go.uber.org/mock/gomock"
 )
 

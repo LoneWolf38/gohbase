@@ -8,7 +8,7 @@ package filter
 import (
 	"errors"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -51,35 +51,37 @@ const (
 )
 
 // Ensure our types implement Filter correctly.
-var _ Filter = (*List)(nil)
-var _ Filter = (*ColumnCountGetFilter)(nil)
-var _ Filter = (*ColumnPaginationFilter)(nil)
-var _ Filter = (*ColumnPrefixFilter)(nil)
-var _ Filter = (*ColumnRangeFilter)(nil)
-var _ Filter = (*CompareFilter)(nil)
-var _ Filter = (*DependentColumnFilter)(nil)
-var _ Filter = (*FamilyFilter)(nil)
-var _ Filter = (*Wrapper)(nil)
-var _ Filter = (*FirstKeyOnlyFilter)(nil)
-var _ Filter = (*FirstKeyValueMatchingQualifiersFilter)(nil)
-var _ Filter = (*FuzzyRowFilter)(nil)
-var _ Filter = (*InclusiveStopFilter)(nil)
-var _ Filter = (*KeyOnlyFilter)(nil)
-var _ Filter = (*MultipleColumnPrefixFilter)(nil)
-var _ Filter = (*PageFilter)(nil)
-var _ Filter = (*PrefixFilter)(nil)
-var _ Filter = (*QualifierFilter)(nil)
-var _ Filter = (*RandomRowFilter)(nil)
-var _ Filter = (*RowFilter)(nil)
-var _ Filter = (*SingleColumnValueFilter)(nil)
-var _ Filter = (*SingleColumnValueExcludeFilter)(nil)
-var _ Filter = (*SkipFilter)(nil)
-var _ Filter = (*TimestampsFilter)(nil)
-var _ Filter = (*ValueFilter)(nil)
-var _ Filter = (*WhileMatchFilter)(nil)
-var _ Filter = (*AllFilter)(nil)
-var _ Filter = (*RowRange)(nil)
-var _ Filter = (*MultiRowRangeFilter)(nil)
+var (
+	_ Filter = (*List)(nil)
+	_ Filter = (*ColumnCountGetFilter)(nil)
+	_ Filter = (*ColumnPaginationFilter)(nil)
+	_ Filter = (*ColumnPrefixFilter)(nil)
+	_ Filter = (*ColumnRangeFilter)(nil)
+	_ Filter = (*CompareFilter)(nil)
+	_ Filter = (*DependentColumnFilter)(nil)
+	_ Filter = (*FamilyFilter)(nil)
+	_ Filter = (*Wrapper)(nil)
+	_ Filter = (*FirstKeyOnlyFilter)(nil)
+	_ Filter = (*FirstKeyValueMatchingQualifiersFilter)(nil)
+	_ Filter = (*FuzzyRowFilter)(nil)
+	_ Filter = (*InclusiveStopFilter)(nil)
+	_ Filter = (*KeyOnlyFilter)(nil)
+	_ Filter = (*MultipleColumnPrefixFilter)(nil)
+	_ Filter = (*PageFilter)(nil)
+	_ Filter = (*PrefixFilter)(nil)
+	_ Filter = (*QualifierFilter)(nil)
+	_ Filter = (*RandomRowFilter)(nil)
+	_ Filter = (*RowFilter)(nil)
+	_ Filter = (*SingleColumnValueFilter)(nil)
+	_ Filter = (*SingleColumnValueExcludeFilter)(nil)
+	_ Filter = (*SkipFilter)(nil)
+	_ Filter = (*TimestampsFilter)(nil)
+	_ Filter = (*ValueFilter)(nil)
+	_ Filter = (*WhileMatchFilter)(nil)
+	_ Filter = (*AllFilter)(nil)
+	_ Filter = (*RowRange)(nil)
+	_ Filter = (*MultiRowRangeFilter)(nil)
+)
 
 // Filter is TODO
 type Filter interface {
@@ -238,7 +240,8 @@ type ColumnRangeFilter pb.ColumnRangeFilter
 
 // NewColumnRangeFilter is TODO
 func NewColumnRangeFilter(minColumn, maxColumn []byte,
-	minColumnInclusive, maxColumnInclusive bool) *ColumnRangeFilter {
+	minColumnInclusive, maxColumnInclusive bool,
+) *ColumnRangeFilter {
 	return &ColumnRangeFilter{
 		MinColumn:          minColumn,
 		MaxColumn:          maxColumn,
@@ -294,7 +297,8 @@ type DependentColumnFilter pb.DependentColumnFilter
 
 // NewDependentColumnFilter is TODO
 func NewDependentColumnFilter(compareFilter *CompareFilter, columnFamily, columnQualifier []byte,
-	dropDependentColumn bool) *DependentColumnFilter {
+	dropDependentColumn bool,
+) *DependentColumnFilter {
 	return &DependentColumnFilter{
 		CompareFilter:       (*pb.CompareFilter)(compareFilter),
 		ColumnFamily:        columnFamily,
@@ -387,7 +391,8 @@ type FirstKeyValueMatchingQualifiersFilter pb.FirstKeyValueMatchingQualifiersFil
 
 // NewFirstKeyValueMatchingQualifiersFilter is TODO
 func NewFirstKeyValueMatchingQualifiersFilter(
-	qualifiers [][]byte) *FirstKeyValueMatchingQualifiersFilter {
+	qualifiers [][]byte,
+) *FirstKeyValueMatchingQualifiersFilter {
 	return &FirstKeyValueMatchingQualifiersFilter{
 		Qualifiers: qualifiers,
 	}
@@ -622,7 +627,8 @@ type SingleColumnValueFilter pb.SingleColumnValueFilter
 
 // NewSingleColumnValueFilter is TODO
 func NewSingleColumnValueFilter(columnFamily, columnQualifier []byte, compareOp CompareType,
-	comparatorObj Comparator, filterIfMissing, latestVersionOnly bool) *SingleColumnValueFilter {
+	comparatorObj Comparator, filterIfMissing, latestVersionOnly bool,
+) *SingleColumnValueFilter {
 	obj, err := comparatorObj.ConstructPBComparator()
 	if err != nil {
 		panic(err)
@@ -664,7 +670,8 @@ type SingleColumnValueExcludeFilter pb.SingleColumnValueExcludeFilter
 
 // NewSingleColumnValueExcludeFilter is TODO
 func NewSingleColumnValueExcludeFilter(
-	filter *SingleColumnValueFilter) *SingleColumnValueExcludeFilter {
+	filter *SingleColumnValueFilter,
+) *SingleColumnValueExcludeFilter {
 	return &SingleColumnValueExcludeFilter{
 		SingleColumnValueFilter: (*pb.SingleColumnValueFilter)(filter),
 	}

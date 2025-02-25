@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -358,7 +358,6 @@ func findCommaFromEnd(b []byte, offset int) int {
 }
 
 func (i *info) MarshalJSON() ([]byte, error) {
-
 	var ctxError, client string
 
 	if i.ctx != nil {

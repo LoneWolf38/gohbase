@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -59,7 +59,8 @@ func WithDestinationRegionServer(serverName string) func(Call) error {
 // NewMoveRegion creates an hrpc to move region to a different RegionServer.
 // Specify encoded region name.
 func NewMoveRegion(ctx context.Context, regionName []byte,
-	opts ...func(Call) error) (*MoveRegion, error) {
+	opts ...func(Call) error,
+) (*MoveRegion, error) {
 	mr := &MoveRegion{
 		base: base{
 			ctx:      ctx,

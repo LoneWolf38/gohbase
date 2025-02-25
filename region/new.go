@@ -15,15 +15,16 @@ import (
 	"net"
 	"time"
 
-	"github.com/tsuna/gohbase/compression"
-	"github.com/tsuna/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/compression"
+	"github.com/LoneWolf38/gohbase/hrpc"
 )
 
 // NewClient creates a new RegionClient.
 func NewClient(addr string, ctype ClientType, queueSize int, flushInterval time.Duration,
 	effectiveUser string, readTimeout time.Duration, codec compression.Codec,
 	dialer func(ctx context.Context, network, addr string) (net.Conn, error),
-	slogger *slog.Logger) hrpc.RegionClient {
+	slogger *slog.Logger,
+) hrpc.RegionClient {
 	c := &client{
 		addr:          addr,
 		ctype:         ctype,

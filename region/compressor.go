@@ -12,7 +12,7 @@ import (
 	"net"
 	"slices"
 
-	"github.com/tsuna/gohbase/compression"
+	"github.com/LoneWolf38/gohbase/compression"
 )
 
 type compressor struct {

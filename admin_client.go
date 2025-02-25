@@ -12,10 +12,10 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/region"
-	"github.com/tsuna/gohbase/zk"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/region"
+	"github.com/LoneWolf38/gohbase/zk"
 )
 
 const (
@@ -175,7 +175,6 @@ func (c *client) checkProcedureWithBackoff(ctx context.Context, procID uint64) e
 //
 // If a context happens during creation, no cleanup is done.
 func (c *client) CreateSnapshot(t *hrpc.Snapshot) error {
-
 	pbmsg, err := c.SendRPC(t)
 	if err != nil {
 		return err
@@ -241,7 +240,6 @@ func (c *client) ListSnapshots(t *hrpc.ListSnapshots) ([]*pb.SnapshotDescription
 	}
 
 	return r.GetSnapshots(), nil
-
 }
 
 func (c *client) RestoreSnapshot(t *hrpc.Snapshot) error {

@@ -20,16 +20,16 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LoneWolf38/gohbase/compression"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/region"
+	"github.com/LoneWolf38/gohbase/test"
+	"github.com/LoneWolf38/gohbase/test/mock"
+	mockRegion "github.com/LoneWolf38/gohbase/test/mock/region"
+	mockZk "github.com/LoneWolf38/gohbase/test/mock/zk"
+	"github.com/LoneWolf38/gohbase/zk"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/tsuna/gohbase/compression"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/region"
-	"github.com/tsuna/gohbase/test"
-	"github.com/tsuna/gohbase/test/mock"
-	mockRegion "github.com/tsuna/gohbase/test/mock/region"
-	mockZk "github.com/tsuna/gohbase/test/mock/zk"
-	"github.com/tsuna/gohbase/zk"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/wrapperspb"
@@ -174,8 +174,8 @@ func TestReestablishRegionSplit(t *testing.T) {
 	}
 
 	expRegs := map[string]struct{}{
-		"hbase:meta,,1": struct{}{},
-		"test1,,1480547738107.825c5c7e480c76b73d6d2bad5d3f7bb8.": struct{}{},
+		"hbase:meta,,1": {},
+		"test1,,1480547738107.825c5c7e480c76b73d6d2bad5d3f7bb8.": {},
 	}
 
 	// make sure those are the right clients
@@ -310,7 +310,8 @@ func TestEstablishRegionDialFail(t *testing.T) {
 	c.newRegionClientFn = func(_ string, _ region.ClientType, _ int, _ time.Duration,
 		_ string, _ time.Duration, _ compression.Codec,
 		_ func(ctx context.Context, network, addr string) (net.Conn, error),
-		_ *slog.Logger) hrpc.RegionClient {
+		_ *slog.Logger,
+	) hrpc.RegionClient {
 		var rc hrpc.RegionClient
 		if newRegionClientFnCallCount == 0 {
 			rc = rcFailDial
@@ -652,7 +653,6 @@ func TestFindRegion(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestErrCannotFindRegion(t *testing.T) {
@@ -904,7 +904,6 @@ func TestSendBatchBasic(t *testing.T) {
 		// expecting only one region because meta isn't in cache, it's hard-coded
 		t.Errorf("Expected 1 regions in cache, got %d", c.regions.regions.Len())
 	}
-
 }
 
 func TestSendBatchBadInput(t *testing.T) {
@@ -945,8 +944,10 @@ func TestSendBatchBadInput(t *testing.T) {
 	}, {
 		name:  "duplicate2",
 		batch: []hrpc.Call{rpc1, rpc2, rpc2, newRPC("table", true), rpc1},
-		expErr: []string{NotExecutedError.Error(), NotExecutedError.Error(),
-			"duplicate call", NotExecutedError.Error(), "duplicate call"},
+		expErr: []string{
+			NotExecutedError.Error(), NotExecutedError.Error(),
+			"duplicate call", NotExecutedError.Error(), "duplicate call",
+		},
 	}, {
 		name:   "tables",
 		batch:  []hrpc.Call{newRPC("table", true), newRPC("different_table", true)},
@@ -957,16 +958,20 @@ func TestSendBatchBadInput(t *testing.T) {
 		expErr: []string{"non-batchable"},
 	}, {
 		name: "various errors",
-		batch: []hrpc.Call{rpc1,
+		batch: []hrpc.Call{
+			rpc1,
 			newRPC("table", false),
 			rpc1,
 			newRPC("table2", true),
-			newRPC("table", true)},
-		expErr: []string{NotExecutedError.Error(),
+			newRPC("table", true),
+		},
+		expErr: []string{
+			NotExecutedError.Error(),
 			"non-batchable",
 			"duplicate call",
 			"multiple tables",
-			NotExecutedError.Error()},
+			NotExecutedError.Error(),
+		},
 	}} {
 		t.Run(tc.name, func(t *testing.T) {
 			if len(tc.batch) != len(tc.expErr) {
@@ -1139,7 +1144,6 @@ func TestFindClients(t *testing.T) {
 			got, ok := c.findClients(context.Background(), tc.batch, results)
 			if ok && len(tc.expErrs) > 0 {
 				t.Fatalf("expected error, %v", results[3])
-
 			} else if !ok && len(tc.expErrs) == 0 {
 				t.Fatalf("unexpected !ok: %v", results)
 			} else if !ok {
@@ -1197,7 +1201,8 @@ func TestFindClients(t *testing.T) {
 func TestSendBatchWaitForCompletion(t *testing.T) {
 	sleepCh := make(chan struct{})
 	sleepAndIncreaseBackoffOverride = func(ctx context.Context, backoff time.Duration) (
-		time.Duration, error) {
+		time.Duration, error,
+	) {
 		sleepCh <- struct{}{}
 		return backoff, nil
 	}

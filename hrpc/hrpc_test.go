@@ -16,9 +16,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/test"
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/test"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -71,7 +71,8 @@ func TestNewGet(t *testing.T) {
 }
 
 func confirmGetAttributes(ctx context.Context, g *Get, table, key []byte,
-	fam map[string][]string, filter1 filter.Filter) bool {
+	fam map[string][]string, filter1 filter.Filter,
+) bool {
 	if g.Context() != ctx ||
 		!bytes.Equal(g.Table(), table) ||
 		!bytes.Equal(g.Key(), key) ||
@@ -92,7 +93,7 @@ func TestGetToProto(t *testing.T) {
 			Value: []byte("region"),
 		}
 		fil = filter.NewList(filter.MustPassAll, filter.NewKeyOnlyFilter(false))
-		fam = map[string][]string{"cookie": []string{"got", "it"}}
+		fam = map[string][]string{"cookie": {"got", "it"}}
 	)
 
 	tests := []struct {
@@ -201,7 +202,6 @@ func TestGetToProto(t *testing.T) {
 				t.Fatalf("expected %+v, got %+v", tcase.expProto, out)
 			}
 		})
-
 	}
 }
 
@@ -272,7 +272,7 @@ func TestScanToProto(t *testing.T) {
 		startRow = []byte("start")
 		stopRow  = []byte("stop")
 		fil      = filter.NewKeyOnlyFilter(false)
-		fam      = map[string][]string{"cookie": []string{"got", "it"}}
+		fam      = map[string][]string{"cookie": {"got", "it"}}
 	)
 
 	tests := []struct {
@@ -590,7 +590,6 @@ func TestScanToProto(t *testing.T) {
 				t.Fatalf("expected %+v, got %+v", tcase.expProto, out)
 			}
 		})
-
 	}
 }
 
@@ -757,7 +756,7 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_PUT.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					Attribute: []*pb.NameBytesPair{
-						&pb.NameBytesPair{
+						{
 							Name:  &attributeNameTTL,
 							Value: []byte("\x00\x00\x00\x00\x00\x00\x03\xe8"),
 						},
@@ -771,7 +770,7 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_PUT.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					Attribute: []*pb.NameBytesPair{
-						&pb.NameBytesPair{
+						{
 							Name:  &attributeNameTTL,
 							Value: []byte("\x00\x00\x00\x00\x00\x00\x03\xe8"),
 						},
@@ -783,14 +782,14 @@ func TestMutate(t *testing.T) {
 		{
 			in: func() (*Mutate, error) {
 				return NewPut(ctx, table, key, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				})
 			},
 			inStr: func() (*Mutate, error) {
 				return NewPutStr(ctx, tableStr, keyStr, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				})
@@ -802,10 +801,10 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_PUT.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q"),
 									Value:     []byte("value"),
 								},
@@ -827,27 +826,28 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x1f\x00\x00\x00\x12\x00\x00\x00\x05\x00\x03" +
 					"key" + "\x02" + "cf" + "q" +
-					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04" + "value")},
+					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04" + "value"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
 				return NewPut(ctx, table, key, map[string]map[string][]byte{
-					"cf1": map[string][]byte{
+					"cf1": {
 						"q1": []byte("value"),
 						"q2": []byte("value"),
 					},
-					"cf2": map[string][]byte{
+					"cf2": {
 						"q1": []byte("value"),
 					},
 				})
 			},
 			inStr: func() (*Mutate, error) {
 				return NewPutStr(ctx, tableStr, keyStr, map[string]map[string][]byte{
-					"cf1": map[string][]byte{
+					"cf1": {
 						"q1": []byte("value"),
 						"q2": []byte("value"),
 					},
-					"cf2": map[string][]byte{
+					"cf2": {
 						"q1": []byte("value"),
 					},
 				})
@@ -859,23 +859,23 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_PUT.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf1"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q1"),
 									Value:     []byte("value"),
 								},
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q2"),
 									Value:     []byte("value"),
 								},
 							},
 						},
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf2"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q1"),
 									Value:     []byte("value"),
 								},
@@ -903,19 +903,20 @@ func TestMutate(t *testing.T) {
 					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04" + "value"),
 				[]byte("\x00\x00\x00!\x00\x00\x00\x14\x00\x00\x00\x05\x00\x03" +
 					"key" + "\x03" + "cf2" + "q1" +
-					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04" + "value")},
+					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04" + "value"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
 				return NewPut(ctx, table, key, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				}, Timestamp(time.Unix(0, 42*1e6)))
 			},
 			inStr: func() (*Mutate, error) {
 				return NewPutStr(ctx, tableStr, keyStr, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				}, Timestamp(time.Unix(0, 42*1e6)))
@@ -928,10 +929,10 @@ func TestMutate(t *testing.T) {
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					Timestamp:  proto.Uint64(42),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q"),
 									Value:     []byte("value"),
 									Timestamp: proto.Uint64(42),
@@ -955,19 +956,20 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x1f\x00\x00\x00\x12\x00\x00\x00\x05\x00\x03" +
 					"key" + "\x02" + "cf" + "q" +
-					"\x00\x00\x00\x00\x00\x00\x00*\x04" + "value")},
+					"\x00\x00\x00\x00\x00\x00\x00*\x04" + "value"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
 				return NewPut(ctx, table, key, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				}, TimestampUint64(42))
 			},
 			inStr: func() (*Mutate, error) {
 				return NewPutStr(ctx, tableStr, keyStr, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				}, TimestampUint64(42))
@@ -980,10 +982,10 @@ func TestMutate(t *testing.T) {
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					Timestamp:  proto.Uint64(42),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q"),
 									Value:     []byte("value"),
 									Timestamp: proto.Uint64(42),
@@ -1008,7 +1010,8 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x1f\x00\x00\x00\x12\x00\x00\x00\x05\x00\x03" +
 					"key" + "\x02" + "cf" + "q" +
-					"\x00\x00\x00\x00\x00\x00\x00*\x04" + "value")},
+					"\x00\x00\x00\x00\x00\x00\x00*\x04" + "value"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
@@ -1038,14 +1041,14 @@ func TestMutate(t *testing.T) {
 		{
 			in: func() (*Mutate, error) {
 				return NewDel(ctx, table, key, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				}, TimestampUint64(42))
 			},
 			inStr: func() (*Mutate, error) {
 				return NewDelStr(ctx, tableStr, keyStr, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"q": []byte("value"),
 					},
 				}, TimestampUint64(42))
@@ -1058,10 +1061,10 @@ func TestMutate(t *testing.T) {
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					Timestamp:  proto.Uint64(42),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier:  []byte("q"),
 									Value:      []byte("value"),
 									Timestamp:  proto.Uint64(42),
@@ -1086,7 +1089,8 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x1f\x00\x00\x00\x12\x00\x00\x00\x05\x00\x03" +
 					"key" + "\x02" + "cf" + "q" +
-					"\x00\x00\x00\x00\x00\x00\x00*\f" + "value")},
+					"\x00\x00\x00\x00\x00\x00\x00*\f" + "value"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
@@ -1152,10 +1156,10 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_INCREMENT.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier: []byte("q"),
 									Value:     []byte("\x00\x00\x00\x00\x00\x00\x00\x01"),
 								},
@@ -1178,7 +1182,8 @@ func TestMutate(t *testing.T) {
 				[]byte("\x00\x00\x00\"\x00\x00\x00\x12\x00\x00\x00\b\x00\x03" +
 					"key" + "\x02" + "cf" + "q" +
 					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04" +
-					"\x00\x00\x00\x00\x00\x00\x00\x01")},
+					"\x00\x00\x00\x00\x00\x00\x00\x01"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
@@ -1198,10 +1203,10 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_DELETE.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier:  []byte{},
 									DeleteType: pb.MutationProto_DELETE_FAMILY.Enum(),
 								},
@@ -1223,7 +1228,8 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x19\x00\x00\x00\x11\x00\x00\x00\x00\x00\x03" +
 					"key" + "\x02" + "cf" + "" +
-					"\u007f\xff\xff\xff\xff\xff\xff\xff\x0e")},
+					"\u007f\xff\xff\xff\xff\xff\xff\xff\x0e"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
@@ -1244,10 +1250,10 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_DELETE.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier:  []byte{},
 									Timestamp:  proto.Uint64(42),
 									DeleteType: pb.MutationProto_DELETE_FAMILY.Enum(),
@@ -1271,7 +1277,8 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x19\x00\x00\x00\x11\x00\x00\x00\x00\x00\x03" +
 					"key" + "\x02" + "cf" + "" +
-					"\x00\x00\x00\x00\x00\x00\x00*\x0e")},
+					"\x00\x00\x00\x00\x00\x00\x00*\x0e"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
@@ -1292,10 +1299,10 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_DELETE.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier:  []byte{},
 									Timestamp:  proto.Uint64(42),
 									DeleteType: pb.MutationProto_DELETE_FAMILY_VERSION.Enum(),
@@ -1319,19 +1326,20 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x19\x00\x00\x00\x11\x00\x00\x00\x00\x00\x03" +
 					"key" + "\x02" + "cf" + "" +
-					"\x00\x00\x00\x00\x00\x00\x00*\n")},
+					"\x00\x00\x00\x00\x00\x00\x00*\n"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
 				return NewDel(ctx, table, key, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"a": nil,
 					},
 				}, TimestampUint64(42), DeleteOneVersion())
 			},
 			inStr: func() (*Mutate, error) {
 				return NewDelStr(ctx, tableStr, keyStr, map[string]map[string][]byte{
-					"cf": map[string][]byte{
+					"cf": {
 						"a": nil,
 					},
 				}, TimestampUint64(42), DeleteOneVersion())
@@ -1344,10 +1352,10 @@ func TestMutate(t *testing.T) {
 					MutateType: pb.MutationProto_DELETE.Enum(),
 					Durability: pb.MutationProto_USE_DEFAULT.Enum(),
 					ColumnValue: []*pb.MutationProto_ColumnValue{
-						&pb.MutationProto_ColumnValue{
+						{
 							Family: []byte("cf"),
 							QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-								&pb.MutationProto_ColumnValue_QualifierValue{
+								{
 									Qualifier:  []byte("a"),
 									Timestamp:  proto.Uint64(42),
 									DeleteType: pb.MutationProto_DELETE_ONE_VERSION.Enum(),
@@ -1371,7 +1379,8 @@ func TestMutate(t *testing.T) {
 			cellblocks: [][]byte{
 				[]byte("\x00\x00\x00\x1a\x00\x00\x00\x12\x00\x00\x00\x00\x00\x03" +
 					"key" + "\x02" + "cf" + "a" +
-					"\x00\x00\x00\x00\x00\x00\x00*\b")},
+					"\x00\x00\x00\x00\x00\x00\x00*\b"),
+			},
 		},
 		{
 			in: func() (*Mutate, error) {
@@ -1480,14 +1489,14 @@ func TestMutate(t *testing.T) {
 }
 
 var expectedCells = []*pb.Cell{
-	&pb.Cell{
+	{
 		Row:       []byte("row7"),
 		Family:    []byte("cf"),
 		Qualifier: []byte("b"),
 		Timestamp: proto.Uint64(1494873081120),
 		Value:     []byte("Hello my name is Dog."),
 	},
-	&pb.Cell{
+	{
 		Row:       []byte("row7"),
 		Family:    []byte("cf"),
 		Qualifier: []byte("a"),
@@ -1496,9 +1505,12 @@ var expectedCells = []*pb.Cell{
 		CellType:  pb.CellType_PUT.Enum(),
 	},
 }
-var cellblock = []byte{0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
+
+var cellblock = []byte{
+	0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
 	102, 97, 0, 0, 1, 92, 13, 97, 5, 32, 4, 72, 101, 108, 108, 111, 32, 109, 121, 32, 110,
-	97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46}
+	97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46,
+}
 
 func TestDeserializeCellBlocksGet(t *testing.T) {
 	// the first cell is already in protobuf
@@ -1563,9 +1575,9 @@ func TestDeserializeCellblocksMutate(t *testing.T) {
 
 func TestDeserializeCellBlocksScan(t *testing.T) {
 	expectedResults := []*pb.Result{
-		&pb.Result{
+		{
 			Cell: []*pb.Cell{
-				&pb.Cell{
+				{
 					Row:       []byte("row7"),
 					Family:    []byte("cf"),
 					Qualifier: []byte("c"),
@@ -1573,7 +1585,7 @@ func TestDeserializeCellBlocksScan(t *testing.T) {
 					Value:     []byte("Hello my name is Dog."),
 					CellType:  pb.CellType_PUT.Enum(),
 				},
-				&pb.Cell{
+				{
 					Row:       []byte("row7"),
 					Family:    []byte("cf"),
 					Qualifier: []byte("b"),
@@ -1584,9 +1596,9 @@ func TestDeserializeCellBlocksScan(t *testing.T) {
 			},
 			Partial: proto.Bool(true),
 		},
-		&pb.Result{
+		{
 			Cell: []*pb.Cell{
-				&pb.Cell{
+				{
 					Row:       []byte("row7"),
 					Family:    []byte("cf"),
 					Qualifier: []byte("a"),
@@ -1598,7 +1610,8 @@ func TestDeserializeCellBlocksScan(t *testing.T) {
 			Partial: proto.Bool(false),
 		},
 	}
-	cellblocks := []byte{0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
+	cellblocks := []byte{
+		0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
 		102, 99, 0, 0, 1, 92, 13, 97, 5, 32, 4, 72, 101, 108, 108, 111, 32, 109, 121, 32, 110,
 		97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46,
 		0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
@@ -1606,7 +1619,8 @@ func TestDeserializeCellBlocksScan(t *testing.T) {
 		97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46,
 		0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
 		102, 97, 0, 0, 1, 92, 13, 97, 5, 32, 4, 72, 101, 108, 108, 111, 32, 109, 121, 32, 110,
-		97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46}
+		97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46,
+	}
 
 	scanResp := &pb.ScanResponse{
 		Results:              []*pb.Result{},
@@ -1640,7 +1654,8 @@ func TestDeserializeCellBlocksScan(t *testing.T) {
 
 func confirmScanAttributes(ctx context.Context, s *Scan, table, start, stop []byte,
 	fam map[string][]string, fltr filter.Filter, numberOfRows uint32,
-	renewInterval time.Duration, renewalScan bool) bool {
+	renewInterval time.Duration, renewalScan bool,
+) bool {
 	if fltr == nil && s.filter != nil {
 		return false
 	}
@@ -1662,24 +1677,24 @@ func BenchmarkMutateToProtoWithNestedMaps(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		data := map[string]map[string][]byte{
-			"cf": map[string][]byte{
-				"a": []byte{10},
-				"b": []byte{20},
-				"c": []byte{30, 0},
-				"d": []byte{40, 0, 0, 0},
-				"e": []byte{50, 0, 0, 0, 0, 0, 0, 0},
-				"f": []byte{60},
-				"g": []byte{70},
-				"h": []byte{80, 0},
-				"i": []byte{90, 0, 0, 0},
-				"j": []byte{100, 0, 0, 0, 0, 0, 0, 0},
-				"k": []byte{0, 0, 220, 66},
-				"l": []byte{0, 0, 0, 0, 0, 0, 94, 64},
-				"m": []byte{0, 0, 2, 67, 0, 0, 0, 0},
-				"n": []byte{0, 0, 0, 0, 0, 128, 97, 64, 0, 0, 0, 0, 0, 0, 0, 0},
-				"o": []byte{150},
-				"p": []byte{4, 8, 15, 26, 23, 42},
-				"q": []byte{1, 1, 3, 5, 8, 13, 21, 34, 55},
+			"cf": {
+				"a": {10},
+				"b": {20},
+				"c": {30, 0},
+				"d": {40, 0, 0, 0},
+				"e": {50, 0, 0, 0, 0, 0, 0, 0},
+				"f": {60},
+				"g": {70},
+				"h": {80, 0},
+				"i": {90, 0, 0, 0},
+				"j": {100, 0, 0, 0, 0, 0, 0, 0},
+				"k": {0, 0, 220, 66},
+				"l": {0, 0, 0, 0, 0, 0, 94, 64},
+				"m": {0, 0, 2, 67, 0, 0, 0, 0},
+				"n": {0, 0, 0, 0, 0, 128, 97, 64, 0, 0, 0, 0, 0, 0, 0, 0},
+				"o": {150},
+				"p": {4, 8, 15, 26, 23, 42},
+				"q": {1, 1, 3, 5, 8, 13, 21, 34, 55},
 				"r": []byte("This is a test string."),
 			},
 		}

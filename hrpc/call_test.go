@@ -10,14 +10,16 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
 func TestCellFromCellBlock(t *testing.T) {
-	cellblock := []byte{0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
+	cellblock := []byte{
+		0, 0, 0, 48, 0, 0, 0, 19, 0, 0, 0, 21, 0, 4, 114, 111, 119, 55, 2, 99,
 		102, 97, 0, 0, 1, 92, 13, 97, 5, 32, 4, 72, 101, 108, 108, 111, 32, 109, 121, 32, 110,
-		97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46}
+		97, 109, 101, 32, 105, 115, 32, 68, 111, 103, 46,
+	}
 
 	cell, n, err := cellFromCellBlock(cellblock)
 	if err != nil {
@@ -68,11 +70,13 @@ func TestCellFromCellBlock(t *testing.T) {
 }
 
 func TestDeserializeCellblocks(t *testing.T) {
-	cellblocks := []byte{0, 0, 0, 50, 0, 0, 0, 41, 0, 0, 0, 1, 0, 26, 84, 101, 115, 116, 83, 99,
+	cellblocks := []byte{
+		0, 0, 0, 50, 0, 0, 0, 41, 0, 0, 0, 1, 0, 26, 84, 101, 115, 116, 83, 99,
 		97, 110, 84, 105, 109, 101, 82, 97, 110, 103, 101, 86, 101, 114, 115, 105, 111, 110, 115,
 		49, 2, 99, 102, 97, 0, 0, 0, 0, 0, 0, 0, 51, 4, 49, 0, 0, 0, 50, 0, 0, 0, 41, 0, 0, 0, 1,
 		0, 26, 84, 101, 115, 116, 83, 99, 97, 110, 84, 105, 109, 101, 82, 97, 110, 103, 101, 86,
-		101, 114, 115, 105, 111, 110, 115, 50, 2, 99, 102, 97, 0, 0, 0, 0, 0, 0, 0, 52, 4, 49}
+		101, 114, 115, 105, 111, 110, 115, 50, 2, 99, 102, 97, 0, 0, 0, 0, 0, 0, 0, 52, 4, 49,
+	}
 
 	cells, read, err := deserializeCellBlocks(cellblocks, 2)
 	if err != nil {
@@ -83,7 +87,7 @@ func TestDeserializeCellblocks(t *testing.T) {
 	}
 
 	expectedCells := []*pb.Cell{
-		&pb.Cell{
+		{
 			Row:       []byte("TestScanTimeRangeVersions1"),
 			Family:    []byte("cf"),
 			Qualifier: []byte("a"),
@@ -91,7 +95,7 @@ func TestDeserializeCellblocks(t *testing.T) {
 			Value:     []byte("1"),
 			CellType:  pb.CellType_PUT.Enum(),
 		},
-		&pb.Cell{
+		{
 			Row:       []byte("TestScanTimeRangeVersions2"),
 			Family:    []byte("cf"),
 			Qualifier: []byte("a"),

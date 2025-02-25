@@ -8,18 +8,20 @@ package mock_test
 import (
 	"net"
 
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/test/mock"
+	regionMock "github.com/LoneWolf38/gohbase/test/mock/region"
+	zkMock "github.com/LoneWolf38/gohbase/test/mock/zk"
+	"github.com/LoneWolf38/gohbase/zk"
 	"github.com/tsuna/gohbase"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/test/mock"
-	regionMock "github.com/tsuna/gohbase/test/mock/region"
-	zkMock "github.com/tsuna/gohbase/test/mock/zk"
-	"github.com/tsuna/gohbase/zk"
 )
 
-var _ gohbase.Client = (*mock.MockClient)(nil)
-var _ gohbase.RPCClient = (*mock.MockRPCClient)(nil)
-var _ gohbase.AdminClient = (*mock.MockAdminClient)(nil)
-var _ hrpc.Call = (*mock.MockCall)(nil)
-var _ net.Conn = (*mock.MockConn)(nil)
-var _ zk.Client = (*zkMock.MockClient)(nil)
-var _ hrpc.RegionClient = (*regionMock.MockRegionClient)(nil)
+var (
+	_ gohbase.Client      = (*mock.MockClient)(nil)
+	_ gohbase.RPCClient   = (*mock.MockRPCClient)(nil)
+	_ gohbase.AdminClient = (*mock.MockAdminClient)(nil)
+	_ hrpc.Call           = (*mock.MockCall)(nil)
+	_ net.Conn            = (*mock.MockConn)(nil)
+	_ zk.Client           = (*zkMock.MockClient)(nil)
+	_ hrpc.RegionClient   = (*regionMock.MockRegionClient)(nil)
+)

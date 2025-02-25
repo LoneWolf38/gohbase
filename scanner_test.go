@@ -15,12 +15,12 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/region"
-	"github.com/tsuna/gohbase/test"
-	"github.com/tsuna/gohbase/test/mock"
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/region"
+	"github.com/LoneWolf38/gohbase/test"
+	"github.com/LoneWolf38/gohbase/test/mock"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/proto"
 )
@@ -51,32 +51,32 @@ func (c *scanMatcher) String() string {
 
 var resultsPB = []*pb.Result{
 	// region 1
-	&pb.Result{
+	{
 		Cell: []*pb.Cell{
-			&pb.Cell{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("1")},
-			&pb.Cell{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("2")},
-			&pb.Cell{Row: []byte("a"), Family: []byte("B"), Qualifier: []byte("1")},
+			{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("1")},
+			{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("2")},
+			{Row: []byte("a"), Family: []byte("B"), Qualifier: []byte("1")},
 		},
 	},
-	&pb.Result{
+	{
 		Cell: []*pb.Cell{
-			&pb.Cell{Row: []byte("b"), Family: []byte("A"), Qualifier: []byte("1")},
-			&pb.Cell{Row: []byte("b"), Family: []byte("B"), Qualifier: []byte("2")},
+			{Row: []byte("b"), Family: []byte("A"), Qualifier: []byte("1")},
+			{Row: []byte("b"), Family: []byte("B"), Qualifier: []byte("2")},
 		},
 	},
 	// region 2
-	&pb.Result{
+	{
 		Cell: []*pb.Cell{
-			&pb.Cell{Row: []byte("bar"), Family: []byte("C"), Qualifier: []byte("1")},
-			&pb.Cell{Row: []byte("baz"), Family: []byte("C"), Qualifier: []byte("2")},
-			&pb.Cell{Row: []byte("baz"), Family: []byte("C"), Qualifier: []byte("2")},
+			{Row: []byte("bar"), Family: []byte("C"), Qualifier: []byte("1")},
+			{Row: []byte("baz"), Family: []byte("C"), Qualifier: []byte("2")},
+			{Row: []byte("baz"), Family: []byte("C"), Qualifier: []byte("2")},
 		},
 	},
 	// region 3
-	&pb.Result{
+	{
 		Cell: []*pb.Cell{
-			&pb.Cell{Row: []byte("yolo"), Family: []byte("D"), Qualifier: []byte("1")},
-			&pb.Cell{Row: []byte("yolo"), Family: []byte("D"), Qualifier: []byte("2")},
+			{Row: []byte("yolo"), Family: []byte("D"), Qualifier: []byte("1")},
+			{Row: []byte("yolo"), Family: []byte("D"), Qualifier: []byte("2")},
 		},
 	},
 }
@@ -96,7 +96,8 @@ func dup(a []*pb.Result) []*pb.Result {
 }
 
 func testCallClose(scan *hrpc.Scan, c *mock.MockRPCClient, scannerID uint64,
-	group *sync.WaitGroup, t *testing.T) {
+	group *sync.WaitGroup, t *testing.T,
+) {
 	//	t.Helper()
 
 	s, err := hrpc.NewScanRange(context.Background(), table, nil, nil,
@@ -202,16 +203,16 @@ func TestScanner(t *testing.T) {
 }
 
 var cells = []*pb.Cell{
-	&pb.Cell{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("1")}, // 0
-	&pb.Cell{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("2")},
-	&pb.Cell{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("3")},
-	&pb.Cell{Row: []byte("b"), Family: []byte("B"), Qualifier: []byte("1")},   // 3
-	&pb.Cell{Row: []byte("b"), Family: []byte("B"), Qualifier: []byte("2")},   // 4
-	&pb.Cell{Row: []byte("bar"), Family: []byte("B"), Qualifier: []byte("1")}, // 5
-	&pb.Cell{Row: []byte("bar"), Family: []byte("B"), Qualifier: []byte("2")},
-	&pb.Cell{Row: []byte("bar"), Family: []byte("B"), Qualifier: []byte("3")}, // 7
-	&pb.Cell{Row: []byte("foo"), Family: []byte("F"), Qualifier: []byte("1")}, // 8
-	&pb.Cell{Row: []byte("foo"), Family: []byte("F"), Qualifier: []byte("2")}, // 9
+	{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("1")}, // 0
+	{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("2")},
+	{Row: []byte("a"), Family: []byte("A"), Qualifier: []byte("3")},
+	{Row: []byte("b"), Family: []byte("B"), Qualifier: []byte("1")},   // 3
+	{Row: []byte("b"), Family: []byte("B"), Qualifier: []byte("2")},   // 4
+	{Row: []byte("bar"), Family: []byte("B"), Qualifier: []byte("1")}, // 5
+	{Row: []byte("bar"), Family: []byte("B"), Qualifier: []byte("2")},
+	{Row: []byte("bar"), Family: []byte("B"), Qualifier: []byte("3")}, // 7
+	{Row: []byte("foo"), Family: []byte("F"), Qualifier: []byte("1")}, // 8
+	{Row: []byte("foo"), Family: []byte("F"), Qualifier: []byte("2")}, // 9
 }
 
 func TestPartialResults(t *testing.T) {
@@ -584,8 +585,8 @@ func testErrorScanFromID(t *testing.T, scan *hrpc.Scan, out []*hrpc.Result) {
 		ScannerId:           cp(scannerID),
 		MoreResultsInRegion: proto.Bool(true),
 		Results: []*pb.Result{
-			&pb.Result{Cell: cells[:3]},
-			&pb.Result{Cell: cells[3:4]},
+			{Cell: cells[:3]},
+			{Cell: cells[3:4]},
 		},
 	}, nil).Times(1)
 
@@ -638,42 +639,42 @@ func testPartialResults(t *testing.T, scan *hrpc.Scan, expected []*hrpc.Result) 
 		{
 			region: region1,
 			results: []*pb.Result{
-				&pb.Result{Cell: cells[:3], Partial: proto.Bool(true)},
-				&pb.Result{Cell: cells[3:4], Partial: proto.Bool(true)},
+				{Cell: cells[:3], Partial: proto.Bool(true)},
+				{Cell: cells[3:4], Partial: proto.Bool(true)},
 			},
 			moreResultsInRegion: true,
 		},
 		{ // end of region, should return row b
 			region: region1,
 			results: []*pb.Result{
-				&pb.Result{Cell: cells[4:5], Partial: proto.Bool(true)},
+				{Cell: cells[4:5], Partial: proto.Bool(true)},
 			},
 			scanFromID: true,
 		},
 		{ // half a row in a result in the same response - unlikely, but why not
 			region: region2,
 			results: []*pb.Result{
-				&pb.Result{Cell: cells[5:7], Partial: proto.Bool(true)},
-				&pb.Result{Cell: cells[7:8], Partial: proto.Bool(true)},
+				{Cell: cells[5:7], Partial: proto.Bool(true)},
+				{Cell: cells[7:8], Partial: proto.Bool(true)},
 			},
 			moreResultsInRegion: true,
 		},
 		{ // empty result, last in region
 			region:     region2,
-			results:    []*pb.Result{&pb.Result{Cell: cells[8:8], Partial: proto.Bool(true)}},
+			results:    []*pb.Result{{Cell: cells[8:8], Partial: proto.Bool(true)}},
 			scanFromID: true,
 		},
 		{
 			region: region3,
 			results: []*pb.Result{
-				&pb.Result{Cell: cells[8:9], Partial: proto.Bool(true)},
+				{Cell: cells[8:9], Partial: proto.Bool(true)},
 			},
 			moreResultsInRegion: true,
 		},
 		{ // last row
 			region: region3,
 			results: []*pb.Result{
-				&pb.Result{Cell: cells[9:], Partial: proto.Bool(true)},
+				{Cell: cells[9:], Partial: proto.Bool(true)},
 			},
 			scanFromID: true,
 		},

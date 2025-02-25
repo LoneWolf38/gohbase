@@ -8,7 +8,7 @@ package hrpc
 import (
 	"context"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -40,7 +40,8 @@ var defaultFamiliesAttributes = map[string]string{
 // For use by the admin client.
 func NewCreateTable(ctx context.Context, table []byte,
 	families map[string]map[string]string,
-	options ...func(*CreateTable)) *CreateTable {
+	options ...func(*CreateTable),
+) *CreateTable {
 	ct := &CreateTable{
 		base: base{
 			table:    table,

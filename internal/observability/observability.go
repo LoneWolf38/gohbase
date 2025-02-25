@@ -8,8 +8,8 @@ package observability
 import (
 	"context"
 
+	"github.com/LoneWolf38/gohbase/pb"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/tsuna/gohbase/pb"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
 )

@@ -10,8 +10,8 @@ import (
 	"math"
 	"time"
 
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/pb"
 )
 
 // baseQuery bundles common fields that can be provided for quering requests: Scans and Gets
@@ -76,31 +76,40 @@ func newBaseQuery() baseQuery {
 func (bq *baseQuery) setFamilies(families map[string][]string) {
 	bq.families = families
 }
+
 func (bq *baseQuery) setFilter(filter *pb.Filter) {
 	bq.filter = filter
 }
+
 func (bq *baseQuery) setTimeRangeUint64(from, to uint64) {
 	bq.fromTimestamp = from
 	bq.toTimestamp = to
 }
+
 func (bq *baseQuery) setMaxVersions(versions uint32) {
 	bq.maxVersions = versions
 }
+
 func (bq *baseQuery) setMaxResultsPerColumnFamily(maxresults uint32) {
 	bq.storeLimit = maxresults
 }
+
 func (bq *baseQuery) setResultOffset(offset uint32) {
 	bq.storeOffset = offset
 }
+
 func (bq *baseQuery) setCacheBlocks(cacheBlocks bool) {
 	bq.cacheBlocks = cacheBlocks
 }
+
 func (bq *baseQuery) setConsistency(consistency ConsistencyType) {
 	bq.consistency = consistency
 }
+
 func (bq *baseQuery) setPriority(priority uint32) {
 	bq.priority = priority
 }
+
 func (bq *baseQuery) Priority() uint32 {
 	return bq.priority
 }

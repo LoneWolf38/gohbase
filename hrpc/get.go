@@ -8,7 +8,7 @@ package hrpc
 import (
 	"context"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -24,7 +24,8 @@ type Get struct {
 
 // baseGet returns a Get struct with default values set.
 func baseGet(ctx context.Context, table []byte, key []byte,
-	options ...func(Call) error) (*Get, error) {
+	options ...func(Call) error,
+) (*Get, error) {
 	g := &Get{
 		base: base{
 			key:      key,
@@ -43,13 +44,15 @@ func baseGet(ctx context.Context, table []byte, key []byte,
 
 // NewGet creates a new Get request for the given table and row key.
 func NewGet(ctx context.Context, table, key []byte,
-	options ...func(Call) error) (*Get, error) {
+	options ...func(Call) error,
+) (*Get, error) {
 	return baseGet(ctx, table, key, options...)
 }
 
 // NewGetStr creates a new Get request for the given table and row key.
 func NewGetStr(ctx context.Context, table, key string,
-	options ...func(Call) error) (*Get, error) {
+	options ...func(Call) error,
+) (*Get, error) {
 	return NewGet(ctx, []byte(table), []byte(key), options...)
 }
 

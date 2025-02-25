@@ -15,10 +15,10 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/internal/observability"
-	"github.com/tsuna/gohbase/region"
-	"github.com/tsuna/gohbase/zk"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/internal/observability"
+	"github.com/LoneWolf38/gohbase/region"
+	"github.com/LoneWolf38/gohbase/zk"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/trace"
@@ -119,7 +119,8 @@ func (c *client) SendRPC(rpc hrpc.Call) (msg proto.Message, err error) {
 }
 
 func (c *client) getRegionAndClientForRPC(ctx context.Context, rpc hrpc.Call) (
-	hrpc.RegionClient, error) {
+	hrpc.RegionClient, error,
+) {
 	for {
 		reg, err := c.getRegionForRpc(ctx, rpc)
 		if err != nil {
@@ -168,12 +169,10 @@ func (c *client) getRegionAndClientForRPC(ctx context.Context, rpc hrpc.Call) (
 	}
 }
 
-var (
-	// NotExecutedError is returned when an RPC in a batch is not
-	// executed due to encountering a different error in the batch.
-	NotExecutedError = errors.New(
-		"RPC in batch not executed due to another error")
-)
+// NotExecutedError is returned when an RPC in a batch is not
+// executed due to encountering a different error in the batch.
+var NotExecutedError = errors.New(
+	"RPC in batch not executed due to another error")
 
 // SendBatch will execute all the Calls in batch. Every Call must have
 // the same table and must be Batchable.
@@ -195,7 +194,8 @@ var (
 // succeeds, fails with a non-retryable error, or the context is
 // canceled.
 func (c *client) SendBatch(ctx context.Context, batch []hrpc.Call) (
-	res []hrpc.RPCResult, allOK bool) {
+	res []hrpc.RPCResult, allOK bool,
+) {
 	if len(batch) == 0 {
 		return nil, true
 	}
@@ -337,8 +337,8 @@ func (c *client) SendBatch(ctx context.Context, batch []hrpc.Call) (
 // will iterate through all the RPCs to ensure that all unknown
 // regions encountered in the batch will start being initialized.
 func (c *client) findClients(ctx context.Context, batch []hrpc.Call, res []hrpc.RPCResult) (
-	map[hrpc.RegionClient][]hrpc.Call, bool) {
-
+	map[hrpc.RegionClient][]hrpc.Call, bool,
+) {
 	rpcByClient := make(map[hrpc.RegionClient][]hrpc.Call)
 	ok := true
 	for i, rpc := range batch {
@@ -366,8 +366,8 @@ func (c *client) findClients(ctx context.Context, batch []hrpc.Call, res []hrpc.
 //     the caller of SendBatch.
 func (c *client) waitForCompletion(ctx context.Context, rc hrpc.RegionClient,
 	rpcs []hrpc.Call, results []hrpc.RPCResult, rpcToRes map[hrpc.Call]int) (
-	retryables []hrpc.Call, shouldBackoff, unretryableError, ok bool) {
-
+	retryables []hrpc.Call, shouldBackoff, unretryableError, ok bool,
+) {
 	ok = true
 	canceledIndex := len(rpcs)
 
@@ -445,7 +445,8 @@ func (c *client) handleResultError(err error, reg hrpc.RegionInfo, rc hrpc.Regio
 }
 
 func sendBlocking(ctx context.Context, rc hrpc.RegionClient, rpc hrpc.Call) (
-	hrpc.RPCResult, error) {
+	hrpc.RPCResult, error,
+) {
 	rc.QueueRPC(rpc)
 
 	ctx, sp := observability.StartSpan(ctx, "waitForResult")
@@ -461,7 +462,8 @@ func sendBlocking(ctx context.Context, rc hrpc.RegionClient, rpc hrpc.Call) (
 }
 
 func (c *client) sendRPCToRegionClient(ctx context.Context, rpc hrpc.Call, rc hrpc.RegionClient) (
-	proto.Message, error) {
+	proto.Message, error,
+) {
 	res, err := sendBlocking(ctx, rc, rpc)
 	if err != nil {
 		return nil, err
@@ -498,7 +500,8 @@ func (c *client) clientDown(client hrpc.RegionClient, reg hrpc.RegionInfo) {
 }
 
 func (c *client) lookupRegion(ctx context.Context,
-	table, key []byte) (hrpc.RegionInfo, string, error) {
+	table, key []byte,
+) (hrpc.RegionInfo, string, error) {
 	var reg hrpc.RegionInfo
 	var addr string
 	var err error
@@ -553,7 +556,8 @@ func (c *client) lookupRegion(ctx context.Context,
 }
 
 func (c *client) lookupAllRegions(ctx context.Context,
-	table []byte) ([]regionInfoAndAddr, error) {
+	table []byte,
+) ([]regionInfoAndAddr, error) {
 	var regs []regionInfoAndAddr
 	var err error
 	backoff := backoffStart
@@ -709,7 +713,8 @@ func createRegionSearchKey(table, key []byte) []byte {
 
 // metaLookup checks meta table for the region in which the given row key for the given table is.
 func (c *client) metaLookup(ctx context.Context,
-	table, key []byte) (hrpc.RegionInfo, string, error) {
+	table, key []byte,
+) (hrpc.RegionInfo, string, error) {
 	metaKey := createRegionSearchKey(table, key)
 	rpc, err := hrpc.NewScanRange(ctx, metaTableName, metaKey, table,
 		hrpc.Families(infoFamily),
@@ -759,7 +764,8 @@ func createAllRegionSearchKey(table []byte) []byte {
 
 // metaLookupForTable checks meta table for all the open table regions.
 func (c *client) metaLookupForTable(ctx context.Context,
-	table []byte) ([]regionInfoAndAddr, error) {
+	table []byte,
+) ([]regionInfoAndAddr, error) {
 	metaKey := createAllRegionSearchKey(table)
 	rpc, err := hrpc.NewScanRange(ctx, metaTableName, table, metaKey,
 		hrpc.Families(infoFamily))

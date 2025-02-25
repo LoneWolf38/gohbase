@@ -9,7 +9,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -94,7 +94,8 @@ type Snapshot struct {
 // NewSnapshot creates a new Snapshot request that will request a
 // new snapshot in HBase.
 func NewSnapshot(ctx context.Context, name string, table string,
-	opts ...func(Call) error) (*Snapshot, error) {
+	opts ...func(Call) error,
+) (*Snapshot, error) {
 	sn := &Snapshot{
 		base{
 			table:    []byte(table),

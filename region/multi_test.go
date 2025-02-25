@@ -14,9 +14,9 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/test"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/test"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -68,15 +68,15 @@ func TestMultiToProto(t *testing.T) {
 	defer ctrl.Finish()
 
 	values := map[string]map[string][]byte{
-		"cf": map[string][]byte{
+		"cf": {
 			"c": []byte("v"),
 		},
 	}
 	valuesProto := []*pb.MutationProto_ColumnValue{
-		&pb.MutationProto_ColumnValue{
+		{
 			Family: []byte("cf"),
 			QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-				&pb.MutationProto_ColumnValue_QualifierValue{
+				{
 					Qualifier: []byte("c"),
 					Value:     []byte("v"),
 				},
@@ -84,15 +84,15 @@ func TestMultiToProto(t *testing.T) {
 		},
 	}
 	delValues := map[string]map[string][]byte{
-		"cf": map[string][]byte{
+		"cf": {
 			"c": nil,
 		},
 	}
 	delProto := []*pb.MutationProto_ColumnValue{
-		&pb.MutationProto_ColumnValue{
+		{
 			Family: []byte("cf"),
 			QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-				&pb.MutationProto_ColumnValue_QualifierValue{
+				{
 					Qualifier:  []byte("c"),
 					DeleteType: pb.MutationProto_DELETE_MULTIPLE_VERSIONS.Enum(),
 				},
@@ -100,10 +100,10 @@ func TestMultiToProto(t *testing.T) {
 		},
 	}
 	appendProto := []*pb.MutationProto_ColumnValue{
-		&pb.MutationProto_ColumnValue{
+		{
 			Family: []byte("cf"),
 			QualifierValue: []*pb.MutationProto_ColumnValue_QualifierValue{
-				&pb.MutationProto_ColumnValue_QualifierValue{
+				{
 					Qualifier: []byte("c"),
 				},
 			},
@@ -135,15 +135,16 @@ func TestMultiToProto(t *testing.T) {
 			}(),
 			out: &pb.MultiRequest{
 				RegionAction: []*pb.RegionAction{
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg0,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(1), Get: &pb.Get{
-								Row: []byte("call0"), TimeRange: &pb.TimeRange{}}},
-							&pb.Action{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(1), Get: &pb.Get{
+								Row: []byte("call0"), TimeRange: &pb.TimeRange{},
+							}},
+							{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
 								Row:         []byte("call1"),
 								MutateType:  pb.MutationProto_PUT.Enum(),
 								Durability:  pb.MutationProto_USE_DEFAULT.Enum(),
@@ -151,19 +152,19 @@ func TestMultiToProto(t *testing.T) {
 							}},
 						},
 					},
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg1,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(3), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(3), Mutation: &pb.MutationProto{
 								Row:         []byte("call2"),
 								MutateType:  pb.MutationProto_APPEND.Enum(),
 								Durability:  pb.MutationProto_USE_DEFAULT.Enum(),
 								ColumnValue: valuesProto,
 							}},
-							&pb.Action{Index: proto.Uint32(4), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(4), Mutation: &pb.MutationProto{
 								Row:         []byte("call3"),
 								MutateType:  pb.MutationProto_DELETE.Enum(),
 								Durability:  pb.MutationProto_USE_DEFAULT.Enum(),
@@ -171,13 +172,13 @@ func TestMultiToProto(t *testing.T) {
 							}},
 						},
 					},
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg2,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(5), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(5), Mutation: &pb.MutationProto{
 								Row:         []byte("call4"),
 								MutateType:  pb.MutationProto_INCREMENT.Enum(),
 								Durability:  pb.MutationProto_USE_DEFAULT.Enum(),
@@ -189,15 +190,16 @@ func TestMultiToProto(t *testing.T) {
 			},
 			cellblocksProto: &pb.MultiRequest{
 				RegionAction: []*pb.RegionAction{
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg0,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(1), Get: &pb.Get{
-								Row: []byte("call0"), TimeRange: &pb.TimeRange{}}},
-							&pb.Action{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(1), Get: &pb.Get{
+								Row: []byte("call0"), TimeRange: &pb.TimeRange{},
+							}},
+							{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
 								Row:                 []byte("call1"),
 								MutateType:          pb.MutationProto_PUT.Enum(),
 								Durability:          pb.MutationProto_USE_DEFAULT.Enum(),
@@ -205,19 +207,19 @@ func TestMultiToProto(t *testing.T) {
 							}},
 						},
 					},
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg1,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(3), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(3), Mutation: &pb.MutationProto{
 								Row:                 []byte("call2"),
 								MutateType:          pb.MutationProto_APPEND.Enum(),
 								Durability:          pb.MutationProto_USE_DEFAULT.Enum(),
 								AssociatedCellCount: proto.Int32(1),
 							}},
-							&pb.Action{Index: proto.Uint32(4), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(4), Mutation: &pb.MutationProto{
 								Row:                 []byte("call3"),
 								MutateType:          pb.MutationProto_DELETE.Enum(),
 								Durability:          pb.MutationProto_USE_DEFAULT.Enum(),
@@ -225,13 +227,13 @@ func TestMultiToProto(t *testing.T) {
 							}},
 						},
 					},
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg2,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(5), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(5), Mutation: &pb.MutationProto{
 								Row:                 []byte("call4"),
 								MutateType:          pb.MutationProto_INCREMENT.Enum(),
 								Durability:          pb.MutationProto_USE_DEFAULT.Enum(),
@@ -254,7 +256,8 @@ func TestMultiToProto(t *testing.T) {
 					"\u007f\xff\xff\xff\xff\xff\xff\xff\f"),
 				[]byte("\x00\x00\x00\x1c\x00\x00\x00\x14\x00\x00\x00\x00\x00\x05" +
 					"call4" + "\x02" + "cf" + "c" +
-					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04")},
+					"\u007f\xff\xff\xff\xff\xff\xff\xff\x04"),
+			},
 		},
 		{ // one call with expired context
 			calls: func() []hrpc.Call {
@@ -269,13 +272,13 @@ func TestMultiToProto(t *testing.T) {
 			}(),
 			out: &pb.MultiRequest{
 				RegionAction: []*pb.RegionAction{
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg0,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
 								Row:        []byte("call1"),
 								MutateType: pb.MutationProto_APPEND.Enum(),
 								Durability: pb.MutationProto_USE_DEFAULT.Enum(),
@@ -286,13 +289,13 @@ func TestMultiToProto(t *testing.T) {
 			},
 			cellblocksProto: &pb.MultiRequest{
 				RegionAction: []*pb.RegionAction{
-					&pb.RegionAction{
+					{
 						Region: &pb.RegionSpecifier{
 							Type:  pb.RegionSpecifier_REGION_NAME.Enum(),
 							Value: []byte("reg0,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 						},
 						Action: []*pb.Action{
-							&pb.Action{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
+							{Index: proto.Uint32(2), Mutation: &pb.MutationProto{
 								Row:                 []byte("call1"),
 								MutateType:          pb.MutationProto_APPEND.Enum(),
 								Durability:          pb.MutationProto_USE_DEFAULT.Enum(),
@@ -437,46 +440,46 @@ func TestMultiReturnResults(t *testing.T) {
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
 					// reg2
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(4),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call3")}},
+									Cell: []*pb.Cell{{Row: []byte("call3")}},
 								},
 							},
 						},
 					},
 					// reg0
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(1),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+									Cell: []*pb.Cell{{Row: []byte("call0")}},
 								},
 							},
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(3),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call2")}},
+									Cell: []*pb.Cell{{Row: []byte("call2")}},
 								},
 							},
 						},
 					},
 					// reg1, results are returned in different order
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(5),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call4")}},
+									Cell: []*pb.Cell{{Row: []byte("call4")}},
 								},
 							},
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call1")}},
+									Cell: []*pb.Cell{{Row: []byte("call1")}},
 								},
 							},
 						},
@@ -484,20 +487,20 @@ func TestMultiReturnResults(t *testing.T) {
 				},
 			},
 			out: []hrpc.RPCResult{
-				hrpc.RPCResult{Msg: &pb.GetResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+				{Msg: &pb.GetResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call0")}},
 				}}},
-				hrpc.RPCResult{Msg: &pb.MutateResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call1")}},
+				{Msg: &pb.MutateResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call1")}},
 				}}},
-				hrpc.RPCResult{Msg: &pb.MutateResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call2")}},
+				{Msg: &pb.MutateResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call2")}},
 				}}},
-				hrpc.RPCResult{Msg: &pb.GetResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call3")}},
+				{Msg: &pb.GetResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call3")}},
 				}}},
-				hrpc.RPCResult{Msg: &pb.MutateResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call4")}},
+				{Msg: &pb.MutateResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call4")}},
 				}}},
 			},
 		},
@@ -518,7 +521,7 @@ func TestMultiReturnResults(t *testing.T) {
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
 					// reg1
-					&pb.RegionActionResult{
+					{
 						Exception: &pb.NameBytesPair{ // retryable exception
 							Name: proto.String(
 								"org.apache.hadoop.hbase.NotServingRegionException"),
@@ -526,18 +529,18 @@ func TestMultiReturnResults(t *testing.T) {
 						},
 					},
 					// reg0, results different order
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(3),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call2")}},
+									Cell: []*pb.Cell{{Row: []byte("call2")}},
 								},
 							},
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(1),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+									Cell: []*pb.Cell{{Row: []byte("call0")}},
 								},
 							},
 						},
@@ -545,15 +548,15 @@ func TestMultiReturnResults(t *testing.T) {
 				},
 			},
 			out: []hrpc.RPCResult{
-				hrpc.RPCResult{Msg: &pb.GetResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+				{Msg: &pb.GetResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call0")}},
 				}}},
-				hrpc.RPCResult{Error: NotServingRegionError{errors.New("HBase Java " +
+				{Error: NotServingRegionError{errors.New("HBase Java " +
 					"exception org.apache.hadoop.hbase.NotServingRegionException:\nYOLO")}},
-				hrpc.RPCResult{Msg: &pb.MutateResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call2")}},
+				{Msg: &pb.MutateResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call2")}},
 				}}},
-				hrpc.RPCResult{Error: NotServingRegionError{errors.New("HBase Java " +
+				{Error: NotServingRegionError{errors.New("HBase Java " +
 					"exception org.apache.hadoop.hbase.NotServingRegionException:\nYOLO")}},
 			},
 		},
@@ -569,19 +572,19 @@ func TestMultiReturnResults(t *testing.T) {
 			regions: []hrpc.RegionInfo{reg0},
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(1),
 								Exception: &pb.NameBytesPair{
 									Name:  proto.String("YOLO"),
 									Value: []byte("SWAG"),
 								},
 							},
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call1")}},
+									Cell: []*pb.Cell{{Row: []byte("call1")}},
 								},
 							},
 						},
@@ -589,9 +592,9 @@ func TestMultiReturnResults(t *testing.T) {
 				},
 			},
 			out: []hrpc.RPCResult{
-				hrpc.RPCResult{Error: errors.New("HBase Java exception YOLO:\nSWAG")},
-				hrpc.RPCResult{Msg: &pb.MutateResponse{Result: &pb.Result{
-					Cell: []*pb.Cell{&pb.Cell{Row: []byte("call1")}},
+				{Error: errors.New("HBase Java exception YOLO:\nSWAG")},
+				{Msg: &pb.MutateResponse{Result: &pb.Result{
+					Cell: []*pb.Cell{{Row: []byte("call1")}},
 				}}},
 			},
 		},
@@ -606,8 +609,8 @@ func TestMultiReturnResults(t *testing.T) {
 			}(),
 			err: ServerError{errors.New("OOOPS")},
 			out: []hrpc.RPCResult{
-				hrpc.RPCResult{Error: ServerError{errors.New("OOOPS")}},
-				hrpc.RPCResult{Error: ServerError{errors.New("OOOPS")}},
+				{Error: ServerError{errors.New("OOOPS")}},
+				{Error: ServerError{errors.New("OOOPS")}},
 			},
 		},
 		{ // non-MultiResponse
@@ -621,12 +624,12 @@ func TestMultiReturnResults(t *testing.T) {
 			},
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(1),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+									Cell: []*pb.Cell{{Row: []byte("call0")}},
 								},
 							},
 						},
@@ -645,12 +648,12 @@ func TestMultiReturnResults(t *testing.T) {
 			regions: []hrpc.RegionInfo{reg0},
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(0),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+									Cell: []*pb.Cell{{Row: []byte("call0")}},
 								},
 							},
 						},
@@ -669,12 +672,12 @@ func TestMultiReturnResults(t *testing.T) {
 			regions: []hrpc.RegionInfo{reg0},
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
-									Cell: []*pb.Cell{&pb.Cell{Row: []byte("call0")}},
+									Cell: []*pb.Cell{{Row: []byte("call0")}},
 								},
 							},
 						},
@@ -764,15 +767,15 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
 					// reg1
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{ // Append
+							{ // Append
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
 									AssociatedCellCount: proto.Int32(1),
 								},
 							},
-							&pb.ResultOrException{ // Delete
+							{ // Delete
 								Index: proto.Uint32(3),
 								Result: &pb.Result{
 									AssociatedCellCount: proto.Int32(0),
@@ -781,9 +784,9 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 						},
 					},
 					// reg0
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{ // Get
+							{ // Get
 								Index: proto.Uint32(1),
 								Result: &pb.Result{
 									AssociatedCellCount: proto.Int32(1),
@@ -797,16 +800,16 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 			out: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
 					// reg1
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{ // Append
+							{ // Append
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
 									Cell:                []*pb.Cell{appendCell},
 									AssociatedCellCount: proto.Int32(1),
 								},
 							},
-							&pb.ResultOrException{ // Delete
+							{ // Delete
 								Index: proto.Uint32(3),
 								Result: &pb.Result{
 									AssociatedCellCount: proto.Int32(0),
@@ -815,9 +818,9 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 						},
 					},
 					// reg0
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{ // Get
+							{ // Get
 								Index: proto.Uint32(1),
 								Result: &pb.Result{
 									Cell:                []*pb.Cell{getCell},
@@ -843,25 +846,27 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
 					// reg1
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{ // Append
+							{ // Append
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
 									AssociatedCellCount: proto.Int32(1),
 								},
 							},
-							&pb.ResultOrException{ // Delete
+							{ // Delete
 								Index: proto.Uint32(3),
 								Exception: &pb.NameBytesPair{
-									Name: proto.String("YOLO"), Value: []byte("SWAG")},
+									Name: proto.String("YOLO"), Value: []byte("SWAG"),
+								},
 							},
 						},
 					},
 					// reg0
-					&pb.RegionActionResult{
+					{
 						Exception: &pb.NameBytesPair{
-							Name: proto.String("YOLO"), Value: []byte("SWAG")},
+							Name: proto.String("YOLO"), Value: []byte("SWAG"),
+						},
 					},
 				},
 			},
@@ -869,26 +874,28 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 			out: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
 					// reg1
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{ // Append
+							{ // Append
 								Index: proto.Uint32(2),
 								Result: &pb.Result{
 									Cell:                []*pb.Cell{appendCell},
 									AssociatedCellCount: proto.Int32(1),
 								},
 							},
-							&pb.ResultOrException{ // Delete
+							{ // Delete
 								Index: proto.Uint32(3),
 								Exception: &pb.NameBytesPair{
-									Name: proto.String("YOLO"), Value: []byte("SWAG")},
+									Name: proto.String("YOLO"), Value: []byte("SWAG"),
+								},
 							},
 						},
 					},
 					// reg0
-					&pb.RegionActionResult{
+					{
 						Exception: &pb.NameBytesPair{
-							Name: proto.String("YOLO"), Value: []byte("SWAG")},
+							Name: proto.String("YOLO"), Value: []byte("SWAG"),
+						},
 					},
 				},
 			},
@@ -896,11 +903,12 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 		{ // region exception and region results
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						Exception: &pb.NameBytesPair{
-							Name: proto.String("YOLO"), Value: []byte("SWAG")},
+							Name: proto.String("YOLO"), Value: []byte("SWAG"),
+						},
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index:  proto.Uint32(2),
 								Result: &pb.Result{AssociatedCellCount: proto.Int32(1)},
 							},
@@ -914,9 +922,9 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 		{ // no result index
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Result: &pb.Result{AssociatedCellCount: proto.Int32(1)},
 							},
 						},
@@ -928,9 +936,9 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 		{ // no result and no exception
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{Index: proto.Uint32(2)},
+							{Index: proto.Uint32(2)},
 						},
 					},
 				},
@@ -940,13 +948,14 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 		{ // result and exception
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index:  proto.Uint32(2),
 								Result: &pb.Result{AssociatedCellCount: proto.Int32(1)},
 								Exception: &pb.NameBytesPair{
-									Name: proto.String("YOLO"), Value: []byte("SWAG")},
+									Name: proto.String("YOLO"), Value: []byte("SWAG"),
+								},
 							},
 						},
 					},
@@ -961,9 +970,9 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 			}(),
 			response: &pb.MultiResponse{
 				RegionActionResult: []*pb.RegionActionResult{
-					&pb.RegionActionResult{
+					{
 						ResultOrException: []*pb.ResultOrException{
-							&pb.ResultOrException{
+							{
 								Index:  proto.Uint32(1),
 								Result: &pb.Result{AssociatedCellCount: proto.Int32(1)},
 							},
@@ -1006,12 +1015,12 @@ func TestMultiDeserializeCellBlocks(t *testing.T) {
 
 func BenchmarkMultiToProto(b *testing.B) {
 	values := map[string]map[string][]byte{
-		"cf": map[string][]byte{
+		"cf": {
 			"c": []byte("v"),
 		},
 	}
 	delValues := map[string]map[string][]byte{
-		"cf": map[string][]byte{
+		"cf": {
 			"c": nil,
 		},
 	}

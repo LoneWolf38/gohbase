@@ -27,12 +27,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/region"
 	"github.com/stretchr/testify/assert"
 	"github.com/tsuna/gohbase"
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/region"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -139,7 +139,7 @@ func TestClusterStatus(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	//Sanity check the data coming back
+	// Sanity check the data coming back
 	if len(stats.GetMaster().GetHostName()) == 0 {
 		t.Fatal("Master hostname is empty in ClusterStatus")
 	}
@@ -231,7 +231,7 @@ func TestMutateGetTableNotFound(t *testing.T) {
 	if err != gohbase.TableNotFound {
 		t.Errorf("Get returned unexpected error: %v", err)
 	}
-	values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}}
+	values := map[string]map[string][]byte{"cf": {"a": []byte("1")}}
 	putRequest, err := hrpc.NewPutStr(context.Background(), table, key, values)
 	if err != nil {
 		t.Fatalf("NewPutStr returned an error: %v", err)
@@ -369,7 +369,7 @@ func TestPut(t *testing.T) {
 
 func TestPutWithTimeout(t *testing.T) {
 	key := "row2"
-	values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}}
+	values := map[string]map[string][]byte{"cf": {"a": []byte("1")}}
 	if host == nil {
 		t.Fatal("Host is not set!")
 	}
@@ -386,7 +386,7 @@ func TestPutWithTimeout(t *testing.T) {
 
 func TestPutMultipleCells(t *testing.T) {
 	key := "row2.5"
-	values := map[string]map[string][]byte{"cf": map[string][]byte{}, "cf2": map[string][]byte{}}
+	values := map[string]map[string][]byte{"cf": {}, "cf2": {}}
 	values["cf"]["a"] = []byte("a")
 	values["cf"]["b"] = []byte("b")
 	values["cf2"]["a"] = []byte("a")
@@ -413,7 +413,6 @@ func TestPutMultipleCells(t *testing.T) {
 				cell.Qualifier, cell.Value)
 		}
 	}
-
 }
 
 func TestMultiplePutsGetsSequentially(t *testing.T) {
@@ -463,7 +462,7 @@ func TestMultiplePutsGetsParallel(t *testing.T) {
 	wg.Wait()
 
 	// All puts are complete. Now do the same for gets.
-	headers := map[string][]string{"cf": []string{"a"}}
+	headers := map[string][]string{"cf": {"a"}}
 	for i := n - 1; i >= 0; i-- {
 		key := fmt.Sprintf("%s_%d", t.Name(), i)
 		wg.Add(1)
@@ -555,42 +554,42 @@ func TestDelete(t *testing.T) {
 			// delete at the second version
 			in: func(key string) (*hrpc.Mutate, error) {
 				return hrpc.NewDelStr(context.Background(), table, key,
-					map[string]map[string][]byte{"cf1": map[string][]byte{"a": nil}},
+					map[string]map[string][]byte{"cf1": {"a": nil}},
 					hrpc.TimestampUint64(ts+1))
 			},
 			// should delete everything at and before the delete timestamp
 			out: []*hrpc.Cell{
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 1),
 					Value:     []byte("v2"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
@@ -602,48 +601,48 @@ func TestDelete(t *testing.T) {
 			// delete at the second version
 			in: func(key string) (*hrpc.Mutate, error) {
 				return hrpc.NewDelStr(context.Background(), table, key,
-					map[string]map[string][]byte{"cf1": map[string][]byte{"a": nil}},
+					map[string]map[string][]byte{"cf1": {"a": nil}},
 					hrpc.TimestampUint64(ts+1), hrpc.DeleteOneVersion())
 			},
 			// should delete only the second version
 			out: []*hrpc.Cell{
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 1),
 					Value:     []byte("v2"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
@@ -660,31 +659,31 @@ func TestDelete(t *testing.T) {
 			},
 			// should leave cf2 untouched
 			out: []*hrpc.Cell{
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 1),
 					Value:     []byte("v2"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
@@ -698,13 +697,13 @@ func TestDelete(t *testing.T) {
 				return hrpc.NewDelStr(context.Background(), table, key,
 					map[string]map[string][]byte{
 						"cf1": nil,
-						"cf2": map[string][]byte{
+						"cf2": {
 							"a": nil,
 						},
 					})
 			},
 			out: []*hrpc.Cell{
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
@@ -721,37 +720,37 @@ func TestDelete(t *testing.T) {
 					}, hrpc.TimestampUint64(ts), hrpc.DeleteOneVersion())
 			},
 			out: []*hrpc.Cell{
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 1),
 					Value:     []byte("v2"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 1),
 					Value:     []byte("v2"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts),
 					Value:     []byte("v1"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("b"),
 					Timestamp: proto.Uint64(ts),
@@ -773,13 +772,13 @@ func TestDelete(t *testing.T) {
 					hrpc.TimestampUint64(ts+1))
 			},
 			out: []*hrpc.Cell{
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf1"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
 					Value:     []byte("v3"),
 				},
-				&hrpc.Cell{
+				{
 					Family:    []byte("cf2"),
 					Qualifier: []byte("a"),
 					Timestamp: proto.Uint64(ts + 2),
@@ -811,7 +810,7 @@ func TestDelete(t *testing.T) {
 				}
 
 				// insert b
-				values := map[string]map[string][]byte{cf: map[string][]byte{
+				values := map[string]map[string][]byte{cf: {
 					"b": []byte("v1"),
 				}}
 				put, err := hrpc.NewPutStr(context.Background(), table, key, values,
@@ -1124,7 +1123,6 @@ func TestScanWithScanMetrics(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 func TestPutTTL(t *testing.T) {
@@ -1132,7 +1130,7 @@ func TestPutTTL(t *testing.T) {
 	c := gohbase.NewClient(*host)
 	defer c.Close()
 
-	var ttl = 2 * time.Second
+	ttl := 2 * time.Second
 
 	err := insertKeyValue(c, key, "cf", []byte("1"), hrpc.TTL(ttl))
 	if err != nil {
@@ -1259,7 +1257,7 @@ func TestAppend(t *testing.T) {
 		t.Errorf("Put returned an error: %v", insertErr)
 	}
 	// Appending " my name is Dog."
-	values := map[string]map[string][]byte{"cf": map[string][]byte{}}
+	values := map[string]map[string][]byte{"cf": {}}
 	values["cf"]["a"] = []byte(" my name is Dog.")
 	appRequest, err := hrpc.NewAppStr(context.Background(), table, key, values)
 	appRsp, err := c.Append(appRequest)
@@ -1360,24 +1358,39 @@ func TestCheckAndPut(t *testing.T) {
 	ef := "cf"
 	eq := "a"
 
-	var castests = []struct {
+	castests := []struct {
 		inValues        map[string]map[string][]byte
 		inExpectedValue []byte
 		out             bool
 	}{
-		{map[string]map[string][]byte{"cf": map[string][]byte{"b": []byte("2")}},
-			nil, true}, // nil instead of empty byte array
-		{map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}},
-			[]byte{}, true},
-		{map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}},
-			[]byte{}, false},
-		{map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("2")}},
-			[]byte("1"), true},
-		{map[string]map[string][]byte{"cf": map[string][]byte{"b": []byte("2")}},
-			[]byte("2"), true}, // put diff column
-		{map[string]map[string][]byte{"cf": map[string][]byte{"b": []byte("2")}},
-			[]byte{}, false}, // diff column
-		{map[string]map[string][]byte{"cf": map[string][]byte{
+		{
+			map[string]map[string][]byte{"cf": {"b": []byte("2")}},
+			nil, true,
+		}, // nil instead of empty byte array
+		{
+			map[string]map[string][]byte{"cf": {"a": []byte("1")}},
+			[]byte{},
+			true,
+		},
+		{
+			map[string]map[string][]byte{"cf": {"a": []byte("1")}},
+			[]byte{},
+			false,
+		},
+		{
+			map[string]map[string][]byte{"cf": {"a": []byte("2")}},
+			[]byte("1"), true,
+		},
+		{
+			map[string]map[string][]byte{"cf": {"b": []byte("2")}},
+			[]byte("2"), true,
+		}, // put diff column
+		{
+			map[string]map[string][]byte{"cf": {"b": []byte("2")}},
+			[]byte{},
+			false,
+		}, // diff column
+		{map[string]map[string][]byte{"cf": {
 			"b": []byte("100"),
 			"a": []byte("100"),
 		}}, []byte("2"), true}, // multiple values
@@ -1390,7 +1403,6 @@ func TestCheckAndPut(t *testing.T) {
 		}
 
 		casRes, err := c.CheckAndPut(putRequest, ef, eq, tt.inExpectedValue)
-
 		if err != nil {
 			t.Fatalf("CheckAndPut error: %s", err)
 		}
@@ -1408,7 +1420,7 @@ func TestCheckAndPutNotPut(t *testing.T) {
 	key := "row101"
 	c := gohbase.NewClient(*host)
 	defer c.Close()
-	values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("lol")}}
+	values := map[string]map[string][]byte{"cf": {"a": []byte("lol")}}
 
 	appRequest, err := hrpc.NewAppStr(context.Background(), table, key, values)
 	_, err = c.CheckAndPut(appRequest, "cf", "a", []byte{})
@@ -1423,10 +1435,9 @@ func TestCheckAndPutParallel(t *testing.T) {
 
 	keyPrefix := "row100.5"
 
-	values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}}
+	values := map[string]map[string][]byte{"cf": {"a": []byte("1")}}
 	capTestFunc := func(p *hrpc.Mutate, ch chan bool) {
 		casRes, err := c.CheckAndPut(p, "cf", "a", []byte{})
-
 		if err != nil {
 			t.Errorf("CheckAndPut error: %s", err)
 		}
@@ -1467,7 +1478,7 @@ func TestCheckAndPutParallel(t *testing.T) {
 func TestClose(t *testing.T) {
 	c := gohbase.NewClient(*host)
 
-	values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}}
+	values := map[string]map[string][]byte{"cf": {"a": []byte("1")}}
 	r, err := hrpc.NewPutStr(context.Background(), table, t.Name(), values)
 	if err != nil {
 		t.Fatal(err)
@@ -1490,7 +1501,7 @@ func TestCloseWithoutMeta(t *testing.T) {
 	c := gohbase.NewClient(*host)
 	c.Close()
 
-	values := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte("1")}}
+	values := map[string]map[string][]byte{"cf": {"a": []byte("1")}}
 	r, err := hrpc.NewPutStr(context.Background(), table, t.Name(), values)
 	if err != nil {
 		t.Fatal(err)
@@ -1584,8 +1595,9 @@ func performNPuts(keyPrefix string, num_ops int) error {
 
 // Helper function. Given a client, key, columnFamily, value inserts into the table under column 'a'
 func insertKeyValue(c gohbase.Client, key, columnFamily string, value []byte,
-	options ...func(hrpc.Call) error) error {
-	values := map[string]map[string][]byte{columnFamily: map[string][]byte{}}
+	options ...func(hrpc.Call) error,
+) error {
+	values := map[string]map[string][]byte{columnFamily: {}}
 	values[columnFamily]["a"] = value
 	putRequest, err := hrpc.NewPutStr(context.Background(), table, key, values, options...)
 	if err != nil {
@@ -1596,8 +1608,9 @@ func insertKeyValue(c gohbase.Client, key, columnFamily string, value []byte,
 }
 
 func deleteKeyValue(c gohbase.Client, key, columnFamily string, value []byte,
-	options ...func(hrpc.Call) error) error {
-	values := map[string]map[string][]byte{columnFamily: map[string][]byte{}}
+	options ...func(hrpc.Call) error,
+) error {
+	values := map[string]map[string][]byte{columnFamily: {}}
 	values[columnFamily]["a"] = value
 	d, err := hrpc.NewDel(context.Background(), []byte(table), []byte(key), values)
 	if err != nil {
@@ -1646,7 +1659,6 @@ func TestMaxResultsPerColumnFamilyGet(t *testing.T) {
 	putRequest, err = hrpc.NewPutStr(context.Background(), table, key, values)
 	if err != nil {
 		t.Errorf(baseErr+"building put string: %s", err)
-
 	}
 	_, err = c.Put(putRequest)
 	if err != nil {
@@ -1749,7 +1761,7 @@ func TestMaxResultsPerColumnFamilyGet(t *testing.T) {
 				)
 			}
 			// make sure the cells returned are what is expected and in correct sequence
-			for i, _ := range result.Cells {
+			for i := range result.Cells {
 				if string(result.Cells[i].Value) != fmt.Sprintf("value %d", offset+i) {
 					t.Errorf(baseErr+"with offset - Expected value %s but received %s",
 						fmt.Sprintf("value %d", offset+i),
@@ -1779,7 +1791,6 @@ func TestMaxResultsPerColumnFamilyScan(t *testing.T) {
 	putRequest, err := hrpc.NewPutStr(context.Background(), table, key, values)
 	if err != nil {
 		t.Errorf(baseErr+"building put string: %s", err)
-
 	}
 	_, err = c.Put(putRequest)
 	if err != nil {
@@ -1790,7 +1801,6 @@ func TestMaxResultsPerColumnFamilyScan(t *testing.T) {
 	putRequest, err = hrpc.NewPutStr(context.Background(), table, key, values)
 	if err != nil {
 		t.Errorf(baseErr+"building put string: %s", err)
-
 	}
 	_, err = c.Put(putRequest)
 	if err != nil {
@@ -1924,7 +1934,6 @@ func TestMaxResultsPerColumnFamilyScan(t *testing.T) {
 	if err == nil {
 		t.Error(baseErr + "- out of range column result parameter accepted")
 	}
-
 }
 
 func TestMultiRequest(t *testing.T) {
@@ -1978,7 +1987,7 @@ func TestMultiRequest(t *testing.T) {
 	}()
 
 	go func() {
-		v := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte{2}}}
+		v := map[string]map[string][]byte{"cf": {"a": {2}}}
 		p, err := hrpc.NewPutStr(context.Background(), table, putKey, v)
 		if err != nil {
 			t.Error(err)
@@ -2009,7 +2018,7 @@ func TestMultiRequest(t *testing.T) {
 	}()
 
 	go func() {
-		v := map[string]map[string][]byte{"cf": map[string][]byte{"a": []byte{4}}}
+		v := map[string]map[string][]byte{"cf": {"a": {4}}}
 		a, err := hrpc.NewAppStr(context.Background(), table, appendKey, v)
 		if err != nil {
 			t.Error(err)
@@ -2059,7 +2068,6 @@ func TestReverseScan(t *testing.T) {
 		putRequest, err := hrpc.NewPutStr(context.Background(), table, key, values)
 		if err != nil {
 			t.Errorf(baseErr+"building put string: %s", err)
-
 		}
 
 		_, err = c.Put(putRequest)
@@ -2073,7 +2081,7 @@ func TestReverseScan(t *testing.T) {
 		table,
 		"REVTEST-999",
 		"REVTEST-",
-		hrpc.Families(map[string][]string{"cf": []string{"reversetest"}}),
+		hrpc.Families(map[string][]string{"cf": {"reversetest"}}),
 		hrpc.Reversed(),
 	)
 	if err != nil {
@@ -2105,7 +2113,7 @@ func TestReverseScan(t *testing.T) {
 		table,
 		"REVTEST-250",
 		"REVTEST-150",
-		hrpc.Families(map[string][]string{"cf": []string{"reversetest"}}),
+		hrpc.Families(map[string][]string{"cf": {"reversetest"}}),
 		hrpc.Reversed(),
 	)
 	if err != nil {
@@ -2131,7 +2139,6 @@ func TestReverseScan(t *testing.T) {
 		t.Errorf(baseErr+" expected 100 rows returned; found %d", i)
 	}
 	results.Close()
-
 }
 
 func TestListTableNames(t *testing.T) {
@@ -2175,18 +2182,18 @@ func TestListTableNames(t *testing.T) {
 			desc:  "match all",
 			regex: ".*",
 			match: []*pb.TableName{
-				&pb.TableName{Qualifier: []byte(table)},
-				&pb.TableName{Qualifier: m1},
-				&pb.TableName{Qualifier: m2},
-				&pb.TableName{Qualifier: []byte(table + "nomatch")},
+				{Qualifier: []byte(table)},
+				{Qualifier: m1},
+				{Qualifier: m2},
+				{Qualifier: []byte(table + "nomatch")},
 			},
 		},
 		{
 			desc:  "match_some",
 			regex: ".*_MATCH.*",
 			match: []*pb.TableName{
-				&pb.TableName{Qualifier: m1},
-				&pb.TableName{Qualifier: m2},
+				{Qualifier: m1},
+				{Qualifier: m2},
 			},
 		},
 		{
@@ -2198,7 +2205,7 @@ func TestListTableNames(t *testing.T) {
 			namespace: "hbase",
 			sys:       true,
 			match: []*pb.TableName{
-				&pb.TableName{Qualifier: []byte("meta")},
+				{Qualifier: []byte("meta")},
 			},
 		},
 	}
@@ -2242,7 +2249,6 @@ func TestListTableNames(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 // Test snapshot creation
@@ -2399,7 +2405,7 @@ func TestMoveRegion(t *testing.T) {
 	// scan meta to get a region to move
 	scan, err := hrpc.NewScan(context.Background(),
 		[]byte("hbase:meta"),
-		hrpc.Families(map[string][]string{"info": []string{"regioninfo"}}))
+		hrpc.Families(map[string][]string{"info": {"regioninfo"}}))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -2452,14 +2458,12 @@ func TestDebugState(t *testing.T) {
 	}
 
 	jsonVal, err := gohbase.DebugState(c)
-
 	if err != nil {
 		t.Fatalf("DebugState returned an error when it shouldn't have: %v", err)
 	}
 
 	var jsonUnMarshal map[string]interface{}
 	err = json.Unmarshal(jsonVal, &jsonUnMarshal)
-
 	if err != nil {
 		t.Fatalf("Encoutered eror when Unmarshalling: %v", err)
 	}
@@ -2515,7 +2519,6 @@ func TestCacheRegions(t *testing.T) {
 	if cacheLength != 4 {
 		t.Fatalf("Expect 4 regions but got: %v", cacheLength)
 	}
-
 }
 
 // TestNewTableFromSnapshot tests the ability to create a snapshot from a table,

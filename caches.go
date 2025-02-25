@@ -12,7 +12,7 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/tsuna/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/hrpc"
 	"modernc.org/b/v2"
 )
 
@@ -29,7 +29,8 @@ type clientRegionCache struct {
 // in cache or otherwise instantiates a new one by calling newClient.
 // TODO: obvious place for optimization (use map with address as key to lookup exisiting clients)
 func (rcc *clientRegionCache) put(addr string, r hrpc.RegionInfo,
-	newClient func() hrpc.RegionClient) hrpc.RegionClient {
+	newClient func() hrpc.RegionClient,
+) hrpc.RegionClient {
 	rcc.m.Lock()
 	for existingClient, regions := range rcc.regions {
 		// check if client already exists, checking by host and port
@@ -96,8 +97,8 @@ func (rcc *clientRegionCache) clientDown(c hrpc.RegionClient) map[hrpc.RegionInf
 // duplication of data. We do this in one function to avoid running the iterations twice
 func (rcc *clientRegionCache) debugInfo(
 	regions map[string]hrpc.RegionInfo,
-	clients map[string]hrpc.RegionClient) map[string][]string {
-
+	clients map[string]hrpc.RegionClient,
+) map[string][]string {
 	// key = RegionClient memory address , value = List of RegionInfo addresses
 	clientRegionCacheMap := map[string][]string{}
 
@@ -154,7 +155,8 @@ func (krc *keyRegionCache) get(key []byte) ([]byte, hrpc.RegionInfo) {
 // reads whole b tree in keyRegionCache and gathers debug info.
 // We append that information in the given map
 func (krc *keyRegionCache) debugInfo(
-	regions map[string]hrpc.RegionInfo) map[string]string {
+	regions map[string]hrpc.RegionInfo,
+) map[string]string {
 	regionCacheMap := map[string]string{}
 
 	krc.m.RLock()

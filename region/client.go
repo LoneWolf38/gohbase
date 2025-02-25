@@ -22,8 +22,8 @@ import (
 
 	"github.com/prometheus/client_golang/prometheus"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
 )
@@ -88,9 +88,9 @@ var (
 )
 
 const (
-	//DefaultLookupTimeout is the default region lookup timeout
+	// DefaultLookupTimeout is the default region lookup timeout
 	DefaultLookupTimeout = 30 * time.Second
-	//DefaultReadTimeout is the default region read timeout
+	// DefaultReadTimeout is the default region read timeout
 	DefaultReadTimeout = 30 * time.Second
 	// RegionClient is a ClientType that means this will be a normal client
 	RegionClient = ClientType("ClientService")
@@ -560,7 +560,8 @@ func (c *client) receive(r io.Reader) (err error) {
 
 		if int(nread) < len(b) {
 			err = RetryableError{
-				fmt.Errorf("short read: buffer length %d, read %d", len(b), nread)}
+				fmt.Errorf("short read: buffer length %d, read %d", len(b), nread),
+			}
 			return
 		}
 	}
@@ -681,7 +682,8 @@ func returnHeader(header *pb.RequestHeader) {
 var pbTrue = proto.Bool(true)
 
 func marshalProto(rpc hrpc.Call, callID uint32, request proto.Message,
-	cellblocksLen uint32) ([]byte, error) {
+	cellblocksLen uint32,
+) ([]byte, error) {
 	header := getHeader()
 	defer returnHeader(header)
 	header.MethodName = proto.String(rpc.Name())
@@ -754,7 +756,6 @@ func marshalProto(rpc hrpc.Call, callID uint32, request proto.Message,
 }
 
 func (c *client) MarshalJSON() ([]byte, error) {
-
 	type Address struct {
 		Network string
 		Address string

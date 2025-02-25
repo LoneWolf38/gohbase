@@ -12,7 +12,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -139,7 +139,8 @@ func DeleteOneVersion() func(Call) error {
 
 // baseMutate returns a Mutate struct without the mutationType filled in.
 func baseMutate(ctx context.Context, table, key []byte, values map[string]map[string][]byte,
-	options ...func(Call) error) (*Mutate, error) {
+	options ...func(Call) error,
+) (*Mutate, error) {
 	m := &Mutate{
 		base: base{
 			table:    table,
@@ -160,7 +161,8 @@ func baseMutate(ctx context.Context, table, key []byte, values map[string]map[st
 // NewPut creates a new Mutation request to insert the given
 // family-column-values in the given row key of the given table.
 func NewPut(ctx context.Context, table, key []byte,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	m, err := baseMutate(ctx, table, key, values, options...)
 	if err != nil {
 		return nil, err
@@ -171,7 +173,8 @@ func NewPut(ctx context.Context, table, key []byte,
 
 // NewPutStr is just like NewPut but takes table and key as strings.
 func NewPutStr(ctx context.Context, table, key string,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	return NewPut(ctx, []byte(table), []byte(key), values, options...)
 }
 
@@ -203,7 +206,8 @@ func NewPutStr(ctx context.Context, table, key string,
 // the timestamp should be passed or it will have no effect as it's an expensive
 // operation to perform.
 func NewDel(ctx context.Context, table, key []byte,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	m, err := baseMutate(ctx, table, key, values, options...)
 	if err != nil {
 		return nil, err
@@ -220,7 +224,8 @@ func NewDel(ctx context.Context, table, key []byte,
 
 // NewDelStr is just like NewDel but takes table and key as strings.
 func NewDelStr(ctx context.Context, table, key string,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	return NewDel(ctx, []byte(table), []byte(key), values, options...)
 }
 
@@ -228,7 +233,8 @@ func NewDelStr(ctx context.Context, table, key string,
 // family-column-values into the existing cells in HBase (or create them if
 // needed), in given row key of the given table.
 func NewApp(ctx context.Context, table, key []byte,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	m, err := baseMutate(ctx, table, key, values, options...)
 	if err != nil {
 		return nil, err
@@ -239,30 +245,34 @@ func NewApp(ctx context.Context, table, key []byte,
 
 // NewAppStr is just like NewApp but takes table and key as strings.
 func NewAppStr(ctx context.Context, table, key string,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	return NewApp(ctx, []byte(table), []byte(key), values, options...)
 }
 
 // NewIncSingle creates a new Mutation request that will increment the given value
 // by amount in HBase under the given table, key, family and qualifier.
 func NewIncSingle(ctx context.Context, table, key []byte, family, qualifier string,
-	amount int64, options ...func(Call) error) (*Mutate, error) {
+	amount int64, options ...func(Call) error,
+) (*Mutate, error) {
 	buf := make([]byte, 8)
 	binary.BigEndian.PutUint64(buf, uint64(amount))
-	value := map[string]map[string][]byte{family: map[string][]byte{qualifier: buf}}
+	value := map[string]map[string][]byte{family: {qualifier: buf}}
 	return NewInc(ctx, table, key, value, options...)
 }
 
 // NewIncStrSingle is just like NewIncSingle but takes table and key as strings.
 func NewIncStrSingle(ctx context.Context, table, key, family, qualifier string,
-	amount int64, options ...func(Call) error) (*Mutate, error) {
+	amount int64, options ...func(Call) error,
+) (*Mutate, error) {
 	return NewIncSingle(ctx, []byte(table), []byte(key), family, qualifier, amount, options...)
 }
 
 // NewInc creates a new Mutation request that will increment the given values
 // in HBase under the given table and key.
 func NewInc(ctx context.Context, table, key []byte,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	m, err := baseMutate(ctx, table, key, values, options...)
 	if err != nil {
 		return nil, err
@@ -273,7 +283,8 @@ func NewInc(ctx context.Context, table, key []byte,
 
 // NewIncStr is just like NewInc but takes table and key as strings.
 func NewIncStr(ctx context.Context, table, key string,
-	values map[string]map[string][]byte, options ...func(Call) error) (*Mutate, error) {
+	values map[string]map[string][]byte, options ...func(Call) error,
+) (*Mutate, error) {
 	return NewInc(ctx, []byte(table), []byte(key), values, options...)
 }
 
@@ -370,7 +381,8 @@ func cellblockLen(rowLen, familyLen, qualifierLen, valueLen int) int {
 }
 
 func appendCellblock(row []byte, family, qualifier string, value []byte, ts uint64, typ byte,
-	cbs []byte) []byte {
+	cbs []byte,
+) []byte {
 	// cellblock layout:
 	//
 	// Header:

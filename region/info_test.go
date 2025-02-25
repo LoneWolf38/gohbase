@@ -14,11 +14,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/test"
+	"github.com/LoneWolf38/gohbase/test/mock"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/test"
-	"github.com/tsuna/gohbase/test/mock"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -201,14 +201,12 @@ func TestRegionInfoMarshalJson(t *testing.T) {
 	}
 
 	jsonVal, err := info.MarshalJSON()
-
 	if err != nil {
 		t.Fatalf("Should not have thrown an error: %v", err)
 	}
 
 	var jsonUnMarshal map[string]interface{}
 	err = json.Unmarshal(jsonVal, &jsonUnMarshal)
-
 	if err != nil {
 		t.Fatalf("Error while unmarshalling JSON, %v", err)
 	}
@@ -220,7 +218,6 @@ func TestRegionInfoMarshalJson(t *testing.T) {
 	assert.Equal(t, strconv.QuoteToASCII(string(stopKey)), jsonUnMarshal["StopKey"])
 	assert.Equal(t, true, jsonUnMarshal["Available"])
 	assert.Equal(t, strconv.QuoteToASCII(string(namespace)), jsonUnMarshal["Namespace"])
-
 }
 
 func TestRegionInfoMarshalJsonNilValues(t *testing.T) {
@@ -241,7 +238,6 @@ func TestRegionInfoMarshalJsonNilValues(t *testing.T) {
 	}
 
 	_, err := info.MarshalJSON()
-
 	if err != nil {
 		t.Fatalf("Should not have thrown an error: %v", err)
 	}

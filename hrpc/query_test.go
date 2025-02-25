@@ -13,12 +13,12 @@ import (
 	"testing"
 	"time"
 
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/test"
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/test"
 )
 
 func TestFamiliesOption(t *testing.T) {
-	f := map[string][]string{"yolo": []string{"swag", "meow"}}
+	f := map[string][]string{"yolo": {"swag", "meow"}}
 
 	g, err := NewGet(context.Background(), nil, nil, Families(f))
 	if err != nil {

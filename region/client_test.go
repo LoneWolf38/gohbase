@@ -23,11 +23,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/test"
+	"github.com/LoneWolf38/gohbase/test/mock"
 	"github.com/stretchr/testify/assert"
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/pb"
-	"github.com/tsuna/gohbase/test"
-	"github.com/tsuna/gohbase/test/mock"
 	"go.uber.org/mock/gomock"
 	"google.golang.org/protobuf/encoding/protowire"
 	"google.golang.org/protobuf/proto"
@@ -623,9 +623,11 @@ func TestReceiveDecodeProtobufError(t *testing.T) {
 	c.inFlight = 1
 
 	// Append mutate response with a chunk in the middle missing
-	response := []byte{6, 8, 1, 26, 2, 8, 38, 34, 0, 0, 0, 22,
+	response := []byte{
+		6, 8, 1, 26, 2, 8, 38, 34, 0, 0, 0, 22,
 		0, 0, 0, 4, 0, 4, 121, 111, 108, 111, 2, 99, 102, 115, 119, 97, 103, 0, 0, 0, 0, 0, 0,
-		0, 0, 4, 109, 101, 111, 119}
+		0, 0, 4, 109, 101, 111, 119,
+	}
 	mockConn.EXPECT().Read(readBufSizeMatcher{l: 4}).Times(1).Return(4, nil).
 		Do(func(buf []byte) { binary.BigEndian.PutUint32(buf, uint32(len(response))) })
 	mockConn.EXPECT().Read(readBufSizeMatcher{l: len(response)}).Times(1).
@@ -671,9 +673,11 @@ func TestReceiveDeserializeCellblocksError(t *testing.T) {
 	c.inFlight = 1
 
 	// Append mutate response
-	response := []byte{6, 8, 1, 26, 2, 8, 38, 6, 10, 4, 16, 1, 32, 0, 0, 0, 0, 34, 0, 0, 0, 22,
+	response := []byte{
+		6, 8, 1, 26, 2, 8, 38, 6, 10, 4, 16, 1, 32, 0, 0, 0, 0, 34, 0, 0, 0, 22,
 		0, 0, 0, 4, 0, 4, 121, 111, 108, 111, 2, 99, 102, 115, 119, 97, 103, 0, 0, 0, 0, 0, 0,
-		0, 0, 4, 109, 101, 111, 119}
+		0, 0, 4, 109, 101, 111, 119,
+	}
 	mockConn.EXPECT().Read(readBufSizeMatcher{l: 4}).Times(1).Return(4, nil).
 		Do(func(buf []byte) { binary.BigEndian.PutUint32(buf, uint32(len(response))) })
 	mockConn.EXPECT().Read(readBufSizeMatcher{l: len(response)}).Times(1).
@@ -744,11 +748,15 @@ func TestProcessRPCs(t *testing.T) {
 		maxsent    int
 		concurrent bool
 	}{
-		{qsize: 100000, interval: 30 * time.Millisecond, ncalls: 100,
-			minsent: 1, maxsent: 1},
+		{
+			qsize: 100000, interval: 30 * time.Millisecond, ncalls: 100,
+			minsent: 1, maxsent: 1,
+		},
 		{qsize: 2, interval: 1000 * time.Hour, ncalls: 100, minsent: 50, maxsent: 50},
-		{qsize: 100, interval: 0 * time.Millisecond, ncalls: 1000,
-			minsent: 1, maxsent: 1000, concurrent: true},
+		{
+			qsize: 100, interval: 0 * time.Millisecond, ncalls: 1000,
+			minsent: 1, maxsent: 1000, concurrent: true,
+		},
 	}
 
 	for i, tcase := range tests {
@@ -910,7 +918,7 @@ func TestSanity(t *testing.T) {
 
 	// using Append as it returns cellblocks
 	app, err := hrpc.NewAppStr(context.Background(), "test1", "yolo",
-		map[string]map[string][]byte{"cf": map[string][]byte{"swag": []byte("meow")}})
+		map[string]map[string][]byte{"cf": {"swag": []byte("meow")}})
 	if err != nil {
 		t.Fatalf("Failed to create Get request: %s", err)
 	}
@@ -922,9 +930,11 @@ func TestSanity(t *testing.T) {
 
 	c.QueueRPC(app)
 
-	response := []byte{6, 8, 1, 26, 2, 8, 38, 6, 10, 4, 16, 1, 32, 0, 0, 0, 0, 34, 0, 0, 0, 22,
+	response := []byte{
+		6, 8, 1, 26, 2, 8, 38, 6, 10, 4, 16, 1, 32, 0, 0, 0, 0, 34, 0, 0, 0, 22,
 		0, 0, 0, 4, 0, 4, 121, 111, 108, 111, 2, 99, 102, 115, 119, 97, 103, 0, 0, 0, 0, 0, 0,
-		0, 0, 4, 109, 101, 111, 119}
+		0, 0, 4, 109, 101, 111, 119,
+	}
 	mockConn.EXPECT().Read(gomock.Any()).Times(1).Return(4, nil).
 		Do(func(buf []byte) {
 			binary.BigEndian.PutUint32(buf, uint32(len(response)))
@@ -956,7 +966,7 @@ func TestSanity(t *testing.T) {
 		AssociatedCellCount: proto.Int32(1),
 		Stale:               proto.Bool(false),
 		Cell: []*pb.Cell{
-			&pb.Cell{
+			{
 				Row:       []byte("yolo"),
 				Family:    []byte("cf"),
 				Qualifier: []byte("swag"),
@@ -1003,7 +1013,7 @@ func TestSanityCompressor(t *testing.T) {
 
 	// using Append as it returns cellblocks
 	app, err := hrpc.NewAppStr(context.Background(), "test1", "yolo",
-		map[string]map[string][]byte{"cf": map[string][]byte{"swag": []byte("meow")}})
+		map[string]map[string][]byte{"cf": {"swag": []byte("meow")}})
 	if err != nil {
 		t.Fatalf("Failed to create Get request: %s", err)
 	}
@@ -1082,7 +1092,7 @@ func TestSanityCompressor(t *testing.T) {
 		AssociatedCellCount: proto.Int32(1),
 		Stale:               proto.Bool(false),
 		Cell: []*pb.Cell{
-			&pb.Cell{
+			{
 				Row:       []byte("yolo"),
 				Family:    []byte("cf"),
 				Qualifier: []byte("swag"),
@@ -1240,14 +1250,12 @@ func TestMarshalJSON(t *testing.T) {
 	}
 
 	jsonVal, err := c.MarshalJSON()
-
 	if err != nil {
 		t.Fatalf("Did not expect Error to be thrown: %v", err)
 	}
 
 	var jsonUnMarshal map[string]interface{}
 	err = json.Unmarshal(jsonVal, &jsonUnMarshal)
-
 	if err != nil {
 		t.Fatalf("Error while unmarshalling JSON, %v", err)
 	}
@@ -1260,7 +1268,6 @@ func TestMarshalJSON(t *testing.T) {
 	assert.Equal(t, string(RegionClient), jsonUnMarshal["ClientType"])
 	assert.Equal(t, float64(0), jsonUnMarshal["InFlight"])
 	assert.Equal(t, float64(id), jsonUnMarshal["Id"])
-
 }
 
 func TestMarshalJSONNilValues(t *testing.T) {

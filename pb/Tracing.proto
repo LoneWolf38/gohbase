@@ -18,11 +18,12 @@
 syntax = "proto2";
 package pb;
 
-option java_package = "org.apache.hadoop.hbase.protobuf.generated";
+option java_package = "org.apache.hadoop.hbase.shaded.protobuf.generated";
 option java_outer_classname = "TracingProtos";
 option java_generate_equals_and_hash = true;
 option optimize_for = SPEED;
 option go_package = "../pb";
+
 
 // OpenTelemetry propagates trace context through https://www.w3.org/TR/trace-context/, which
 // is a text-based approach that passes properties with http headers. Here we will also use this

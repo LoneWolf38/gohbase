@@ -8,8 +8,8 @@ package hrpc
 import (
 	"fmt"
 
-	"github.com/tsuna/gohbase/filter"
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/filter"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -28,7 +28,8 @@ type CheckAndPut struct {
 // expectedValue with the on in HBase located at put's row and provided family:qualifier,
 // and if they are equal, perform the provided put request on the row
 func NewCheckAndPut(put *Mutate, family string,
-	qualifier string, expectedValue []byte) (*CheckAndPut, error) {
+	qualifier string, expectedValue []byte,
+) (*CheckAndPut, error) {
 	if put.mutationType != pb.MutationProto_PUT {
 		return nil, fmt.Errorf("'CheckAndPut' only takes 'Put' request")
 	}

@@ -12,7 +12,7 @@ import (
 	"math"
 	"time"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -85,7 +85,8 @@ type Scan struct {
 
 // baseScan returns a Scan struct with default values set.
 func baseScan(ctx context.Context, table []byte,
-	options ...func(Call) error) (*Scan, error) {
+	options ...func(Call) error,
+) (*Scan, error) {
 	s := &Scan{
 		base: base{
 			table:    table,
@@ -127,7 +128,8 @@ func NewScan(ctx context.Context, table []byte, options ...func(Call) error) (*S
 // The range is half-open, i.e. [startRow; stopRow[ -- stopRow is not
 // included in the range.
 func NewScanRange(ctx context.Context, table, startRow, stopRow []byte,
-	options ...func(Call) error) (*Scan, error) {
+	options ...func(Call) error,
+) (*Scan, error) {
 	scan, err := baseScan(ctx, table, options...)
 	if err != nil {
 		return nil, err
@@ -147,7 +149,8 @@ func NewScanStr(ctx context.Context, table string, options ...func(Call) error) 
 // The range is half-open, i.e. [startRow; stopRow[ -- stopRow is not
 // included in the range.
 func NewScanRangeStr(ctx context.Context, table, startRow, stopRow string,
-	options ...func(Call) error) (*Scan, error) {
+	options ...func(Call) error,
+) (*Scan, error) {
 	return NewScanRange(ctx, []byte(table), []byte(startRow), []byte(stopRow), options...)
 }
 

@@ -8,7 +8,7 @@ package filter
 import (
 	"errors"
 
-	"github.com/tsuna/gohbase/pb"
+	"github.com/LoneWolf38/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -29,13 +29,15 @@ const (
 )
 
 // Ensure our types implement Comparator correctly.
-var _ Comparator = (*BinaryComparator)(nil)
-var _ Comparator = (*LongComparator)(nil)
-var _ Comparator = (*BinaryPrefixComparator)(nil)
-var _ Comparator = (*BitComparator)(nil)
-var _ Comparator = (*NullComparator)(nil)
-var _ Comparator = (*RegexStringComparator)(nil)
-var _ Comparator = (*SubstringComparator)(nil)
+var (
+	_ Comparator = (*BinaryComparator)(nil)
+	_ Comparator = (*LongComparator)(nil)
+	_ Comparator = (*BinaryPrefixComparator)(nil)
+	_ Comparator = (*BitComparator)(nil)
+	_ Comparator = (*NullComparator)(nil)
+	_ Comparator = (*RegexStringComparator)(nil)
+	_ Comparator = (*SubstringComparator)(nil)
+)
 
 // Comparator is TODO
 type Comparator interface {
@@ -132,7 +134,8 @@ type BitComparator pb.BitComparator
 
 // NewBitComparator is TODO
 func NewBitComparator(bitwiseOp BitComparatorBitwiseOp,
-	comparable *ByteArrayComparable) *BitComparator {
+	comparable *ByteArrayComparable,
+) *BitComparator {
 	op := pb.BitComparator_BitwiseOp(bitwiseOp)
 	return &BitComparator{
 		Comparable: comparable.toPB(),
@@ -182,7 +185,8 @@ type RegexStringComparator pb.RegexStringComparator
 
 // NewRegexStringComparator is TODO
 func NewRegexStringComparator(pattern string, patternFlags int32,
-	charset, engine string) *RegexStringComparator {
+	charset, engine string,
+) *RegexStringComparator {
 	return &RegexStringComparator{
 		Pattern:      proto.String(pattern),
 		PatternFlags: proto.Int32(patternFlags),

@@ -12,8 +12,8 @@ package mock
 import (
 	reflect "reflect"
 
-	hrpc "github.com/tsuna/gohbase/hrpc"
-	pb "github.com/tsuna/gohbase/pb"
+	hrpc "github.com/LoneWolf38/gohbase/hrpc"
+	pb "github.com/LoneWolf38/gohbase/pb"
 	gomock "go.uber.org/mock/gomock"
 )
 

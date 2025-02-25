@@ -9,8 +9,8 @@ import (
 	"bytes"
 	"testing"
 
-	"github.com/tsuna/gohbase/hrpc"
-	"github.com/tsuna/gohbase/region"
+	"github.com/LoneWolf38/gohbase/hrpc"
+	"github.com/LoneWolf38/gohbase/region"
 )
 
 func TestRegionDiscovery(t *testing.T) {
@@ -25,26 +25,26 @@ func TestRegionDiscovery(t *testing.T) {
 	// space (both the start and stop keys are empty).
 	family := []byte("info")
 	metaRow := &hrpc.Result{Cells: []*hrpc.Cell{
-		&hrpc.Cell{
+		{
 			Row:       []byte("test,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 			Family:    family,
 			Qualifier: []byte("regioninfo"),
 			Value: []byte("PBUF\b\xc4\xcd\xe9\x99\xe0)\x12\x0f\n\adefault\x12\x04test" +
 				"\x1a\x00\"\x00(\x000\x008\x00"),
 		},
-		&hrpc.Cell{
+		{
 			Row:       []byte("test,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 			Family:    family,
 			Qualifier: []byte("seqnumDuringOpen"),
 			Value:     []byte("\x00\x00\x00\x00\x00\x00\x00\x02"),
 		},
-		&hrpc.Cell{
+		{
 			Row:       []byte("test,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 			Family:    family,
 			Qualifier: []byte("server"),
 			Value:     []byte("localhost:50966"),
 		},
-		&hrpc.Cell{
+		{
 			Row:       []byte("test,,1234567890042.56f833d5569a27c7a43fbf547b4924a4."),
 			Family:    family,
 			Qualifier: []byte("serverstartcode"),

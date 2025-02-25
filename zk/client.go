@@ -16,8 +16,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/LoneWolf38/gohbase/pb"
 	"github.com/go-zookeeper/zk"
-	"github.com/tsuna/gohbase/pb"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -67,8 +67,8 @@ type client struct {
 // NewClient establishes connection to zookeeper and returns the client
 func NewClient(zkquorum string, st time.Duration,
 	dialer func(ctx context.Context, network, addr string) (net.Conn, error),
-	slogger *slog.Logger) Client {
-
+	slogger *slog.Logger,
+) Client {
 	return &client{
 		zks:            strings.Split(zkquorum, ","),
 		sessionTimeout: st,
@@ -133,7 +133,8 @@ func (c *client) LocateResource(resource ResourceName) (string, error) {
 }
 
 func makeZKDialer(ctxDialer func(
-	ctx context.Context, network, addr string) (net.Conn, error)) zk.Dialer {
+	ctx context.Context, network, addr string) (net.Conn, error),
+) zk.Dialer {
 	return func(network, addr string, timeout time.Duration) (net.Conn, error) {
 		ctx, cancel := context.WithTimeout(context.Background(), timeout)
 		defer cancel()
