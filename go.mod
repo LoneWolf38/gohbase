@@ -1,4 +1,4 @@
-module github.com/LoneWol38/gohbase
+module github.com/LoneWolf38/gohbase
 
 go 1.23.0
 
